@@ -9,7 +9,7 @@ import { supabase, isSupabaseConfigured, clearSupabaseConfig } from './utils/sup
 
 const App: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile>(INITIAL_PROFILE);
-  const [activeTab, setActiveTab] = useState<EditorTab>(EditorTab.LINKS);
+  const [activeTab, setActiveTab] = useState<EditorTab>(EditorTab.PROFILE);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -26,14 +26,12 @@ const App: React.FC = () => {
     }
 
     // 2. Non-blocking Auth Check
-    // We check for a session, but we don't block the UI if no session exists (Guest Mode)
     const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
           setUserId(session.user.id);
-          // If we have a user, we try to fetch their data
           await fetchProfile(session.user.id);
         }
       } catch (err) {
@@ -45,15 +43,12 @@ const App: React.FC = () => {
 
     checkSession();
 
-    // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
         setUserId('');
         setProfile(INITIAL_PROFILE);
       } else if (session && session.user.id !== userId) {
         setUserId(session.user.id);
-        // Note: We don't auto-fetch here to avoid overwriting state during a "Sign Up" event
-        // The handleLoginSuccess function manages the specific logic (Load vs Save)
       }
     });
 
@@ -66,12 +61,8 @@ const App: React.FC = () => {
     setUserId(newUserId);
     
     if (isNewUser) {
-      // SCENARIO 1: Sign Up (New User)
-      // The user just created an account. They likely want to SAVE the Vcard they just edited.
       await saveChanges(newUserId);
     } else {
-      // SCENARIO 2: Sign In (Existing User)
-      // The user logged in. We should LOAD their existing Vcard from the database.
       await fetchProfile(newUserId);
     }
   };
@@ -86,7 +77,7 @@ const App: React.FC = () => {
         .single();
 
       if (error) {
-        if (error.code !== 'PGRST116') { // PGRST116 = JSON object requested, multiple (or no) rows returned
+        if (error.code !== 'PGRST116') {
            console.error("Error fetching profile:", error.message);
         }
         setLoading(false);
@@ -98,6 +89,8 @@ const App: React.FC = () => {
           name: data.name || INITIAL_PROFILE.name,
           bio: data.bio || INITIAL_PROFILE.bio,
           avatarUrl: data.avatar_url || INITIAL_PROFILE.avatarUrl,
+          phone: data.phone || INITIAL_PROFILE.phone,
+          email: data.email || INITIAL_PROFILE.email,
           links: data.links || [],
           theme: data.theme || INITIAL_PROFILE.theme,
         });
@@ -129,6 +122,8 @@ const App: React.FC = () => {
         name: profile.name,
         bio: profile.bio,
         avatar_url: profile.avatarUrl,
+        phone: profile.phone,
+        email: profile.email,
         links: profile.links,
         theme: profile.theme,
         updated_at: new Date().toISOString(),
@@ -152,7 +147,6 @@ const App: React.FC = () => {
   };
 
   if (loading && !profile) {
-    // Only full screen load if we have absolutely no data to show
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-gray-50 text-indigo-600">
         <svg className="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -172,17 +166,13 @@ const App: React.FC = () => {
         onSuccess={handleLoginSuccess} 
       />
       
-      {/* Left Side - Editor */}
       <div className="flex-1 flex flex-col min-w-0 z-10 bg-white border-r border-gray-200 shadow-xl lg:shadow-none lg:relative">
-         {/* Header */}
         <header className="h-16 border-b border-gray-200 bg-white flex items-center px-6 flex-shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">L</div>
-            <h1 className="font-bold text-xl tracking-tight text-slate-900">LinkHub<span className="text-indigo-600">AI</span></h1>
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">W</div>
+            <h1 className="font-bold text-xl tracking-tight text-slate-900">Women<span className="text-indigo-600">Cards</span></h1>
           </div>
           <div className="ml-auto flex gap-3 items-center">
-             
-             {/* Auth Status */}
              {!userId && (
                 <button 
                   onClick={() => setIsAuthModalOpen(true)}
@@ -245,7 +235,6 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        {/* Editor Main Content */}
         <div className="flex-1 overflow-hidden relative">
           <EditorPanel 
             profile={profile} 
@@ -256,11 +245,8 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Side - Preview */}
       <div className="hidden lg:flex flex-1 bg-gray-100 items-center justify-center relative overflow-hidden">
-        {/* Background decorative elements */}
         <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50"></div>
-        
         <div className="relative z-10 scale-[0.9] xl:scale-100 transition-transform">
            <PhonePreview profile={profile} />
         </div>

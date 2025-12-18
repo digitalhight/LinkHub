@@ -21,12 +21,14 @@ export interface UserProfile {
   name: string;
   bio: string;
   avatarUrl: string;
+  phone?: string;
+  email?: string;
   links: LinkItem[];
   theme: ThemeConfig;
 }
 
 export enum EditorTab {
-  LINKS = 'LINKS',
   PROFILE = 'PROFILE',
+  LINKS = 'LINKS',
   THEME = 'THEME',
 }

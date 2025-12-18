@@ -11,6 +11,8 @@ const Icons = {
   Wand: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 2 2 2-2 2-2-2 2-2Z"/><path d="m5 2 2 2-2 2-2-2 2-2Z"/><path d="m15 11 2 2-2 2-2-2 2-2Z"/><path d="M6 18c-1.1 0-2-0.9-2-2v-4.5c0-0.3 0.1-0.6 0.2-0.8L8.3 6.6c0.5-0.8 1.4-1.3 2.3-1.3h2.8c0.9 0 1.8 0.5 2.3 1.3l4.1 4.1c0.1 0.2 0.2 0.5 0.2 0.8V16c0 1.1-0.9 2-2 2H6Z"/></svg>,
   ArrowUp: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>,
   ArrowDown: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>,
+  Phone: () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
+  Mail: () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>,
 };
 
 interface EditorPanelProps {
@@ -56,18 +58,6 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
       [newLinks[index], newLinks[index + 1]] = [newLinks[index + 1], newLinks[index]];
     }
     setProfile({ ...profile, links: newLinks });
-  };
-
-  const handleMagicBio = async () => {
-    setIsGeneratingBio(true);
-    try {
-      const bio = await generateBio(profile.name, profile.bio);
-      setProfile({ ...profile, bio });
-    } catch (e) {
-      alert("Failed to generate bio. Ensure API Key is set.");
-    } finally {
-      setIsGeneratingBio(false);
-    }
   };
 
   const handleMagicTheme = async () => {
@@ -202,18 +192,31 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
             />
           </div>
 
-          <div>
-            <div className="flex justify-between items-center mb-1">
-              <label className="block text-xs font-medium text-gray-700">Bio</label>
-              <button 
-                onClick={handleMagicBio}
-                disabled={isGeneratingBio}
-                className="text-xs flex items-center gap-1 text-indigo-600 font-medium hover:text-indigo-800 disabled:opacity-50"
-              >
-                <Icons.Wand />
-                {isGeneratingBio ? 'Generating...' : 'Magic Bio'}
-              </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Tel (Phone)</label>
+              <input 
+                type="tel"
+                value={profile.phone || ''}
+                onChange={(e) => setProfile({...profile, phone: e.target.value})}
+                placeholder="+33 6 00 00 00 00"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              />
             </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Email</label>
+              <input 
+                type="email"
+                value={profile.email || ''}
+                onChange={(e) => setProfile({...profile, email: e.target.value})}
+                placeholder="contact@example.com"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Bio</label>
             <textarea 
               rows={4}
               value={profile.bio}
@@ -321,7 +324,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
       {/* Tabs */}
       <div className="bg-white border-b border-gray-200 px-6 pt-4">
         <div className="flex gap-6 overflow-x-auto no-scrollbar">
-          {(['LINKS', 'PROFILE', 'THEME'] as EditorTab[]).map((tab) => (
+          {(['PROFILE', 'LINKS', 'THEME'] as EditorTab[]).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -331,7 +334,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
                   : 'border-transparent text-gray-500 hover:text-gray-800'
               }`}
             >
-              {tab}
+              {tab === 'PROFILE' ? 'PROFIL' : tab}
             </button>
           ))}
         </div>
@@ -340,8 +343,8 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
       {/* Tab Content */}
       <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
         <div className="max-w-2xl mx-auto">
-          {activeTab === EditorTab.LINKS && renderLinksEditor()}
           {activeTab === EditorTab.PROFILE && renderProfileEditor()}
+          {activeTab === EditorTab.LINKS && renderLinksEditor()}
           {activeTab === EditorTab.THEME && renderThemeEditor()}
         </div>
       </div>
