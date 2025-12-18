@@ -4,51 +4,39 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WomenCards - Votre VCard Digitale</title>
+    <!-- On garde Tailwind en CDN pour la simplicité, l'avertissement n'est pas bloquant -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      // Empêche les scripts tiers (comme share-modal.js d'extensions) de bloquer l'app
+      window.onerror = function(message, source, lineno, colno, error) {
+        if (source && (source.includes('share-modal') || source.includes('extension'))) {
+          console.warn('Ignored external script error:', message);
+          return true; 
+        }
+      };
+    </script>
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-        margin: 0;
-        padding: 0;
-      }
-      /* Sleek Scrollbar */
-      ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #cbd5e1; 
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8; 
-      }
-      /* Fix for blank page flashes */
-      #root {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
+      body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+      #root { min-height: 100vh; display: flex; flex-direction: column; }
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
-    "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
-  }
-}
-</script>
-</head>
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+        "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
+      }
+    }
+    </script>
+  </head>
   <body class="bg-gray-50 text-slate-900">
     <div id="root"></div>
-    <!-- Utilisation de chemins absolus pour éviter les erreurs sur les sous-pages -->
-    <script type="module" src="/index.tsx"></script>
+    <!-- Utilisation du chemin relatif direct pour le module principal -->
+    <script type="module" src="index.tsx"></script>
   </body>
 </html>
