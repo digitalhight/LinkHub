@@ -55,14 +55,36 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen }) => {
             />
           </div>
 
-          <div className="bg-amber-50 text-amber-800 text-[10px] p-4 rounded-lg border border-amber-100">
+          <div className="bg-indigo-50 text-indigo-800 text-[10px] p-4 rounded-lg border border-indigo-100">
             <p className="font-bold mb-2 uppercase flex items-center gap-1">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-              Script SQL Requis
+              Configuration SQL Recommandée
             </p>
-            <p className="mb-2">Pour que les pseudos fonctionnent, exécutez ce code dans le <b>SQL Editor</b> de Supabase :</p>
-            <pre className="bg-white/50 p-2 rounded border border-amber-200 font-mono select-all">
-              ALTER TABLE profiles ADD COLUMN IF NOT EXISTS username TEXT UNIQUE;
+            <p className="mb-2">Exécutez ceci dans le <b>SQL Editor</b> pour créer la table et autoriser la lecture publique :</p>
+            <pre className="bg-white/50 p-2 rounded border border-indigo-200 font-mono select-all text-[9px] overflow-x-auto">
+{`CREATE TABLE IF NOT EXISTS profiles (
+  id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+  username TEXT UNIQUE,
+  name TEXT,
+  bio TEXT,
+  avatar_url TEXT,
+  phone TEXT,
+  email TEXT,
+  links JSONB,
+  theme JSONB,
+  updated_at TIMESTAMP WITH TIME ZONE
+);
+
+-- Activer RLS
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- Autoriser la lecture publique pour tout le monde
+CREATE POLICY "Public profiles are viewable by everyone" 
+ON profiles FOR SELECT USING (true);
+
+-- Autoriser les utilisateurs à modifier leur propre profil
+CREATE POLICY "Users can update own profile" 
+ON profiles FOR ALL USING (auth.uid() = id);`}
             </pre>
           </div>
 

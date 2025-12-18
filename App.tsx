@@ -3,6 +3,7 @@ import { UserProfile, EditorTab } from './types';
 import { INITIAL_PROFILE } from './constants';
 import PhonePreview from './components/PhonePreview';
 import EditorPanel from './components/EditorPanel';
+import PublicProfile from './components/PublicProfile';
 import { AuthModal } from './components/AuthModal';
 import { ConfigModal } from './components/ConfigModal';
 import { supabase, isSupabaseConfigured, clearSupabaseConfig } from './utils/supabaseClient';
@@ -16,8 +17,41 @@ const App: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  
+  const [isPublicView, setIsPublicView] = useState(false);
+  const [publicUsername, setPublicUsername] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    
+    // Logic to determine if we are in public view mode
+    // We ignore common system paths and files with extensions (assets)
+    if (pathSegments.length > 0) {
+      const firstSegment = pathSegments[0].toLowerCase();
+      const hasExtension = firstSegment.includes('.');
+      const isSystemPath = ['index.html', 'auth', 'login', 'admin', 'api', 'https:', 'http:'].includes(firstSegment);
+      const isValidUsernameFormat = /^[a-zA-Z0-9_]+$/.test(firstSegment);
+
+      if (!hasExtension && !isSystemPath && isValidUsernameFormat) {
+        setIsPublicView(true);
+        setPublicUsername(firstSegment);
+      } else {
+        setIsPublicView(false);
+        setPublicUsername(null);
+      }
+    } else {
+      setIsPublicView(false);
+      setPublicUsername(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isPublicView && publicUsername) {
+      fetchPublicProfile(publicUsername);
+      return;
+    }
+
     if (!isSupabaseConfigured()) {
       setIsConfigModalOpen(true);
       setLoading(false);
@@ -52,7 +86,40 @@ const App: React.FC = () => {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [userId]);
+  }, [userId, isPublicView, publicUsername]);
+
+  const fetchPublicProfile = async (username: string) => {
+    setLoading(true);
+    setNotFound(false);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('username', username.toLowerCase().trim())
+        .maybeSingle();
+
+      if (error || !data) {
+        setNotFound(true);
+        console.warn("Profile not found:", username);
+      } else {
+        setProfile({
+          name: data.name || username,
+          username: data.username,
+          bio: data.bio || '',
+          avatarUrl: data.avatar_url || '',
+          phone: data.phone || '',
+          email: data.email || '',
+          links: data.links || [],
+          theme: data.theme || INITIAL_PROFILE.theme,
+        });
+      }
+    } catch (err) {
+      console.error("Fetch public profile error", err);
+      setNotFound(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLoginSuccess = async (newUserId: string, isNewUser: boolean) => {
     setUserId(newUserId);
@@ -132,7 +199,7 @@ const App: React.FC = () => {
 
       if (error) {
         if (error.code === '42703') {
-          throw new Error("La colonne 'username' est manquante dans votre table Supabase. Veuillez cliquer sur le bouton crayon en haut pour voir comment corriger cela.");
+          throw new Error("La colonne 'username' est manquante dans votre table Supabase.");
         }
         throw error;
       }
@@ -147,12 +214,19 @@ const App: React.FC = () => {
     }
   };
 
-  if (loading && !profile) {
+  if (loading) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-gray-50 text-indigo-600">
-        <svg className="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-xl animate-pulse">W</div>
+          <p className="text-sm text-gray-400 font-medium tracking-widest uppercase">Chargement...</p>
+        </div>
       </div>
     );
+  }
+
+  if (isPublicView) {
+    return <PublicProfile profile={profile} notFound={notFound} />;
   }
 
   return (
@@ -167,12 +241,12 @@ const App: React.FC = () => {
             <h1 className="font-bold text-xl tracking-tight text-slate-900">Women<span className="text-indigo-600">Cards</span></h1>
           </div>
           <div className="ml-auto flex gap-3 items-center">
-             {!userId && <button onClick={() => setIsAuthModalOpen(true)} className="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors">Log In / Sign Up</button>}
-             {userId && <button onClick={() => { supabase.auth.signOut(); setProfile(INITIAL_PROFILE); }} className="text-xs font-medium text-gray-500 hover:text-red-600 px-2 transition-colors border border-transparent hover:border-gray-200 rounded py-1">Sign Out</button>}
+             {!userId && <button onClick={() => setIsAuthModalOpen(true)} className="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors">Connexion</button>}
+             {userId && <button onClick={() => { supabase.auth.signOut(); setUserId(''); setProfile(INITIAL_PROFILE); }} className="text-xs font-medium text-gray-500 hover:text-red-600 px-2 transition-colors">Déconnexion</button>}
              <button onClick={handleSave} disabled={saving} className={`text-xs font-semibold px-4 py-2 rounded-lg transition-all min-w-[120px] ${saveSuccess ? 'bg-green-600 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50'}`}>
-              {saving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Changes'}
+              {saving ? 'Sauvegarde...' : saveSuccess ? 'Enregistré !' : 'Enregistrer'}
             </button>
-            <button className="text-xs font-semibold text-gray-400 hover:text-indigo-500 transition-colors px-2" onClick={() => setIsConfigModalOpen(true)} title="Configuration de la base"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+            <button className="text-xs font-semibold text-gray-400 hover:text-indigo-500 transition-colors px-2" onClick={() => setIsConfigModalOpen(true)} title="Configuration"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
           </div>
         </header>
         <div className="flex-1 overflow-hidden relative">

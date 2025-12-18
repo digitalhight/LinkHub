@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WomenCards</title>
+    <title>WomenCards - Votre VCard Digitale</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       body {
         font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 0;
       }
-      /* Custom Scrollbar for sleek look */
+      /* Sleek Scrollbar */
       ::-webkit-scrollbar {
         width: 6px;
         height: 6px;
@@ -25,6 +27,12 @@
       ::-webkit-scrollbar-thumb:hover {
         background: #94a3b8; 
       }
+      /* Fix for blank page flashes */
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
     </style>
   <script type="importmap">
 {
@@ -38,8 +46,9 @@
 }
 </script>
 </head>
-  <body class="bg-gray-50 text-slate-900 overflow-hidden">
-    <div id="root" class="h-screen w-screen flex flex-col"></div>
+  <body class="bg-gray-50 text-slate-900">
+    <div id="root"></div>
+    <!-- Utilisation de chemins absolus pour éviter les erreurs sur les sous-pages -->
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
