@@ -2,10 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-const renderApp = () => {
-  const rootElement = document.getElementById('root');
-  if (!rootElement) return;
+const rootElement = document.getElementById('root');
 
+if (rootElement) {
   try {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
@@ -13,16 +12,16 @@ const renderApp = () => {
         <App />
       </React.StrictMode>
     );
-    console.log("WomenCards: Application mounted successfully");
   } catch (err) {
-    console.error("WomenCards: Mount failed", err);
-    rootElement.innerHTML = `<div style="padding:20px; text-align:center;">Erreur de démarrage. Veuillez vider votre cache.</div>`;
+    console.error("Critical Render Error:", err);
+    rootElement.innerHTML = `
+      <div style="height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:sans-serif; text-align:center; padding:20px;">
+        <h1 style="color:#ef4444;">Oups !</h1>
+        <p>Une erreur de connexion au serveur est survenue.</p>
+        <button onclick="window.location.reload(true)" style="background:#6366f1; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">
+          Réessayer
+        </button>
+      </div>
+    `;
   }
-};
-
-// On attend que le DOM soit prêt pour éviter les erreurs de scripts tiers
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', renderApp);
-} else {
-  renderApp();
 }
