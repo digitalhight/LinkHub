@@ -22,18 +22,35 @@ const App: React.FC = () => {
   const [publicUsername, setPublicUsername] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
 
+  // Détection du profil via le Hash (#/username) ou le Pathname (/username)
   useEffect(() => {
-    const path = window.location.pathname.split('/').filter(Boolean);
-    if (path.length > 0) {
-      const segment = path[0].toLowerCase();
-      // On ignore les chemins techniques
-      if (!['index.html', 'auth', 'login', 'api', 'admin', 'https:', 'http:'].includes(segment) && !segment.includes('.')) {
-        setIsPublicView(true);
-        setPublicUsername(segment);
-        return;
+    const checkRouting = () => {
+      // 1. Vérifier le Hash (Solution anti-404 pour Nginx)
+      const hash = window.location.hash.replace('#/', '').replace('#', '').trim();
+      
+      // 2. Vérifier le Path (Solution standard SPA)
+      const pathSegments = window.location.pathname.split('/').filter(Boolean);
+      const pathSegment = pathSegments.length > 0 ? pathSegments[0] : null;
+
+      const candidate = hash || pathSegment;
+
+      if (candidate) {
+        const segment = candidate.toLowerCase();
+        const isReserved = ['index.html', 'auth', 'login', 'api', 'admin', 'https:', 'http:'].includes(segment);
+        const isFile = segment.includes('.');
+
+        if (!isReserved && !isFile && segment.length >= 3) {
+          setIsPublicView(true);
+          setPublicUsername(segment);
+          return;
+        }
       }
-    }
-    setIsPublicView(false);
+      setIsPublicView(false);
+    };
+
+    checkRouting();
+    window.addEventListener('hashchange', checkRouting);
+    return () => window.removeEventListener('hashchange', checkRouting);
   }, []);
 
   useEffect(() => {
@@ -66,7 +83,9 @@ const App: React.FC = () => {
   }, [isPublicView, publicUsername]);
 
   const fetchPublicProfile = async (username: string) => {
+    if (!isSupabaseConfigured()) { setLoading(false); return; }
     setLoading(true);
+    setNotFound(false);
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -138,7 +157,7 @@ const App: React.FC = () => {
       
       if (error) {
         if (error.message.includes('email')) {
-          throw new Error("La colonne 'email' est manquante dans votre table Supabase. Cliquez sur l'icône crayon en haut à droite pour voir le script SQL à copier.");
+          throw new Error("La colonne 'email' est manquante. Cliquez sur l'icône crayon pour le script SQL.");
         }
         throw error;
       }
@@ -184,6 +203,7 @@ const App: React.FC = () => {
           </div>
           <div className="flex gap-2 items-center">
              {!userId && <button onClick={() => setIsAuthModalOpen(true)} className="text-xs font-bold text-white bg-indigo-600 px-4 py-2 rounded-lg">Connexion</button>}
+             {userId && <button onClick={() => { supabase.auth.signOut(); setUserId(''); setProfile(INITIAL_PROFILE); }} className="text-xs font-medium text-gray-400 hover:text-red-600 px-2 transition-colors">Sortir</button>}
              <button onClick={handleSave} disabled={saving} className={`text-xs font-bold px-4 py-2 rounded-lg transition-all min-w-[100px] ${saveSuccess ? 'bg-green-500 text-white' : 'bg-indigo-600 text-white disabled:opacity-50'}`}>
               {saving ? '...' : saveSuccess ? 'OK !' : 'Enregistrer'}
             </button>

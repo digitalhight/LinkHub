@@ -46,8 +46,6 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
         .maybeSingle();
 
       if (error) throw error;
-
-      // Available if no one has it, or if it's the current user's own username
       setIsUsernameAvailable(!data || data.id === currentUserId);
     } catch (err) {
       console.error("Availability check error:", err);
@@ -57,7 +55,6 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
     }
   }, []);
 
-  // Debounce username check
   useEffect(() => {
     const timer = setTimeout(() => {
       checkUsernameAvailability(profile.username);
@@ -75,7 +72,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
   const addLink = () => {
     const newLink: LinkItem = {
       id: Date.now().toString(),
-      title: 'New Link',
+      title: 'Nouveau lien',
       url: 'https://',
       isActive: true,
     };
@@ -105,11 +102,11 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
         ...profile.theme,
         ...newThemeColors,
         id: `custom-${Date.now()}`,
-        name: 'Custom AI Theme',
+        name: 'Thème IA',
       };
       setProfile({ ...profile, theme: newTheme });
     } catch (e) {
-      alert("Failed to generate theme.");
+      alert("Erreur de génération du thème.");
     } finally {
       setIsGeneratingTheme(false);
     }
@@ -121,11 +118,11 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
         onClick={addLink}
         className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg flex items-center justify-center gap-2 transition-colors"
       >
-        <Icons.Plus /> Add New Link
+        <Icons.Plus /> Ajouter un lien
       </button>
 
       <div className="space-y-3 mt-6">
-        {profile.links.length === 0 && <p className="text-gray-400 text-center py-8">No links yet. Add one to get started!</p>}
+        {profile.links.length === 0 && <p className="text-gray-400 text-center py-8">Aucun lien. Ajoutez-en un !</p>}
         {profile.links.map((link, index) => (
           <div key={link.id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
@@ -133,7 +130,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
                 <Icons.Grip />
               </div>
               <div className="flex-1 font-semibold text-gray-700 text-sm">
-                {link.title || 'Untitled Link'}
+                {link.title || 'Lien sans titre'}
               </div>
               <div className="flex items-center gap-1">
                  <button onClick={() => moveLink(index, 'up')} disabled={index === 0} className="p-1.5 text-gray-400 hover:text-gray-700 disabled:opacity-30"><Icons.ArrowUp /></button>
@@ -147,8 +144,8 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
               </div>
             </div>
             <div className="space-y-3 pl-8">
-              <input type="text" value={link.title} onChange={(e) => handleLinkChange(link.id, 'title', e.target.value)} placeholder="Link Title" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" />
-              <input type="url" value={link.url} onChange={(e) => handleLinkChange(link.id, 'url', e.target.value)} placeholder="URL" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" />
+              <input type="text" value={link.title} onChange={(e) => handleLinkChange(link.id, 'title', e.target.value)} placeholder="Titre du lien" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" />
+              <input type="url" value={link.url} onChange={(e) => handleLinkChange(link.id, 'url', e.target.value)} placeholder="https://" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" />
             </div>
           </div>
         ))}
@@ -159,7 +156,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
   const renderProfileEditor = () => (
     <div className="space-y-6">
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wider">Profile Info</h3>
+        <h3 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wider">Informations du Profil</h3>
         
         <div className="space-y-4">
           <div className="flex flex-col items-center sm:flex-row gap-4">
@@ -167,7 +164,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
                <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 w-full">
-              <label className="block text-xs font-medium text-gray-700 mb-1">Avatar URL</label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">URL de l'avatar</label>
               <input 
                 type="text"
                 value={profile.avatarUrl}
@@ -178,7 +175,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Username (ID unique)</label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Nom d'utilisateur (unique)</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 text-sm">
                 @
@@ -187,7 +184,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
                 type="text"
                 value={profile.username}
                 onChange={(e) => setProfile({...profile, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '')})}
-                placeholder="votre_nom"
+                placeholder="pseudo"
                 className={`w-full pl-7 pr-10 py-2 border rounded-lg text-sm font-semibold outline-none transition-all ${
                   isUsernameAvailable === true ? 'border-green-300 bg-green-50' : 
                   isUsernameAvailable === false ? 'border-red-300 bg-red-50' : 'border-gray-200'
@@ -210,9 +207,9 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
                     isUsernameAvailable === true ? 'Ce nom est disponible !' : 'Minimum 3 caractères'}
                  </p>
                  <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-lg">
-                    <p className="text-[10px] text-indigo-400 font-medium uppercase tracking-tighter mb-0.5">Lien de votre VCard :</p>
+                    <p className="text-[10px] text-indigo-400 font-medium uppercase tracking-tighter mb-0.5">Lien public de votre page :</p>
                     <code className="text-xs text-indigo-700 font-bold break-all">
-                      https://womencards.digitalhight.com/{profile.username || '...'}
+                      {window.location.origin}/#/{profile.username || '...'}
                     </code>
                  </div>
                </div>
@@ -231,11 +228,11 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Tel (Phone)</label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Téléphone</label>
               <input type="tel" value={profile.phone || ''} onChange={(e) => setProfile({...profile, phone: e.target.value})} placeholder="+33..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Email public</label>
               <input type="email" value={profile.email || ''} onChange={(e) => setProfile({...profile, email: e.target.value})} placeholder="contact@..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" />
             </div>
           </div>
@@ -256,7 +253,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
           <Icons.Wand /> <span>Générateur de Thème AI</span>
         </div>
         <div className="flex gap-2">
-          <input type="text" value={themePrompt} onChange={(e) => setThemePrompt(e.target.value)} placeholder="Décrivez une ambiance (ex: Pastel, Luxe)..." className="flex-1 px-3 py-2 border border-indigo-200 rounded-lg text-sm outline-none bg-white" onKeyDown={(e) => e.key === 'Enter' && handleMagicTheme()} />
+          <input type="text" value={themePrompt} onChange={(e) => setThemePrompt(e.target.value)} placeholder="Ex: Luxueux, Pastel, Nature..." className="flex-1 px-3 py-2 border border-indigo-200 rounded-lg text-sm outline-none bg-white" onKeyDown={(e) => e.key === 'Enter' && handleMagicTheme()} />
           <button onClick={handleMagicTheme} disabled={isGeneratingTheme || !themePrompt} className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors">
             {isGeneratingTheme ? '...' : 'Créer'}
           </button>
