@@ -27,48 +27,37 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
   const [themePrompt, setThemePrompt] = useState('');
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
-  const [schemaError, setSchemaError] = useState(false);
 
   const checkUsernameAvailability = useCallback(async (username: string) => {
-    const cleanUsername = username?.toLowerCase().trim();
-    if (!cleanUsername || cleanUsername.length < 3) {
+    if (!username || username.length < 3) {
       setIsUsernameAvailable(null);
       return;
     }
     
     setIsCheckingUsername(true);
-    setSchemaError(false);
     try {
-      const { data: authData } = await supabase.auth.getUser();
-      const currentUserId = authData?.user?.id;
+      const { data: { user } } = await supabase.auth.getUser();
+      const currentUserId = user?.id;
 
       const { data, error } = await supabase
         .from('profiles')
         .select('id')
-        .eq('username', cleanUsername)
+        .eq('username', username.toLowerCase().trim())
         .maybeSingle();
 
-      if (error) {
-        // Handle missing column error (Postgres code 42703)
-        if (error.code === '42703') {
-           setSchemaError(true);
-           setIsUsernameAvailable(null);
-           return;
-        }
-        console.error("Supabase error checking username:", error.message || error);
-        setIsUsernameAvailable(null);
-        return;
-      }
+      if (error) throw error;
 
+      // Available if no one has it, or if it's the current user's own username
       setIsUsernameAvailable(!data || data.id === currentUserId);
-    } catch (err: any) {
-      console.error("Availability check fatal error:", err?.message || err);
+    } catch (err) {
+      console.error("Availability check error:", err);
       setIsUsernameAvailable(null);
     } finally {
       setIsCheckingUsername(false);
     }
   }, []);
 
+  // Debounce username check
   useEffect(() => {
     const timer = setTimeout(() => {
       checkUsernameAvailability(profile.username);
@@ -132,16 +121,20 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
         onClick={addLink}
         className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg flex items-center justify-center gap-2 transition-colors"
       >
-        <Icons.Plus /> Ajouter un lien
+        <Icons.Plus /> Add New Link
       </button>
 
       <div className="space-y-3 mt-6">
-        {profile.links.length === 0 && <p className="text-gray-400 text-center py-8">Aucun lien. Ajoutez-en un !</p>}
+        {profile.links.length === 0 && <p className="text-gray-400 text-center py-8">No links yet. Add one to get started!</p>}
         {profile.links.map((link, index) => (
-          <div key={link.id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <div key={link.id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
-              <div className="text-gray-400 cursor-grab"><Icons.Grip /></div>
-              <div className="flex-1 font-semibold text-gray-700 text-sm">{link.title || 'Sans titre'}</div>
+              <div className="text-gray-400 cursor-grab active:cursor-grabbing">
+                <Icons.Grip />
+              </div>
+              <div className="flex-1 font-semibold text-gray-700 text-sm">
+                {link.title || 'Untitled Link'}
+              </div>
               <div className="flex items-center gap-1">
                  <button onClick={() => moveLink(index, 'up')} disabled={index === 0} className="p-1.5 text-gray-400 hover:text-gray-700 disabled:opacity-30"><Icons.ArrowUp /></button>
                  <button onClick={() => moveLink(index, 'down')} disabled={index === profile.links.length - 1} className="p-1.5 text-gray-400 hover:text-gray-700 disabled:opacity-30"><Icons.ArrowDown /></button>
@@ -154,7 +147,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
               </div>
             </div>
             <div className="space-y-3 pl-8">
-              <input type="text" value={link.title} onChange={(e) => handleLinkChange(link.id, 'title', e.target.value)} placeholder="Titre du lien" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" />
+              <input type="text" value={link.title} onChange={(e) => handleLinkChange(link.id, 'title', e.target.value)} placeholder="Link Title" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" />
               <input type="url" value={link.url} onChange={(e) => handleLinkChange(link.id, 'url', e.target.value)} placeholder="URL" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" />
             </div>
           </div>
@@ -166,7 +159,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
   const renderProfileEditor = () => (
     <div className="space-y-6">
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wider">Informations Profil</h3>
+        <h3 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wider">Profile Info</h3>
         
         <div className="space-y-4">
           <div className="flex flex-col items-center sm:flex-row gap-4">
@@ -174,7 +167,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
                <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 w-full">
-              <label className="block text-xs font-medium text-gray-700 mb-1">URL Avatar</label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Avatar URL</label>
               <input 
                 type="text"
                 value={profile.avatarUrl}
@@ -196,7 +189,6 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
                 onChange={(e) => setProfile({...profile, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '')})}
                 placeholder="votre_nom"
                 className={`w-full pl-7 pr-10 py-2 border rounded-lg text-sm font-semibold outline-none transition-all ${
-                  schemaError ? 'border-amber-300 bg-amber-50' :
                   isUsernameAvailable === true ? 'border-green-300 bg-green-50' : 
                   isUsernameAvailable === false ? 'border-red-300 bg-red-50' : 'border-gray-200'
                 }`}
@@ -204,8 +196,6 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                 {isCheckingUsername ? (
                   <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                ) : schemaError ? (
-                  <span className="text-amber-500"><Icons.Alert /></span>
                 ) : isUsernameAvailable === true ? (
                   <span className="text-green-600"><Icons.Check /></span>
                 ) : isUsernameAvailable === false ? (
@@ -213,12 +203,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
                 ) : null}
               </div>
             </div>
-            {schemaError && (
-              <p className="mt-1 text-[10px] text-amber-600 font-medium">
-                ⚠️ Colonne 'username' manquante dans la base. Voir configuration (icône crayon en haut).
-              </p>
-            )}
-            {profile.username && !schemaError && (
+            {profile.username && (
                <div className="mt-1.5 flex flex-col gap-1">
                  <p className={`text-[10px] font-medium ${isUsernameAvailable === false ? 'text-red-500' : 'text-gray-400'}`}>
                    {isUsernameAvailable === false ? 'Ce nom est déjà pris' : 
@@ -246,7 +231,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Tel</label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Tel (Phone)</label>
               <input type="tel" value={profile.phone || ''} onChange={(e) => setProfile({...profile, phone: e.target.value})} placeholder="+33..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" />
             </div>
             <div>
@@ -268,23 +253,26 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
     <div className="space-y-8">
       <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-xl p-5">
         <div className="flex items-center gap-2 mb-2 text-indigo-900 font-semibold text-sm">
-          <Icons.Wand /> <span>Générateur AI</span>
+          <Icons.Wand /> <span>Générateur de Thème AI</span>
         </div>
         <div className="flex gap-2">
-          <input type="text" value={themePrompt} onChange={(e) => setThemePrompt(e.target.value)} placeholder="Décrivez une ambiance..." className="flex-1 px-3 py-2 border border-indigo-200 rounded-lg text-sm outline-none bg-white" onKeyDown={(e) => e.key === 'Enter' && handleMagicTheme()} />
-          <button onClick={handleMagicTheme} disabled={isGeneratingTheme || !themePrompt} className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700">
+          <input type="text" value={themePrompt} onChange={(e) => setThemePrompt(e.target.value)} placeholder="Décrivez une ambiance (ex: Pastel, Luxe)..." className="flex-1 px-3 py-2 border border-indigo-200 rounded-lg text-sm outline-none bg-white" onKeyDown={(e) => e.key === 'Enter' && handleMagicTheme()} />
+          <button onClick={handleMagicTheme} disabled={isGeneratingTheme || !themePrompt} className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors">
             {isGeneratingTheme ? '...' : 'Créer'}
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {DEFAULT_THEMES.map(theme => (
-          <button key={theme.id} onClick={() => setProfile({...profile, theme})} className={`group relative aspect-[4/5] rounded-xl border-2 transition-all overflow-hidden ${profile.theme.id === theme.id ? 'border-indigo-600 ring-2 ring-indigo-600 ring-offset-2' : 'border-transparent hover:border-gray-300'}`}>
-            <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom right, ${theme.backgroundStart}, ${theme.backgroundEnd})` }}></div>
-            <div className="absolute inset-x-0 bottom-0 p-2 bg-white/90 backdrop-blur-sm"><p className="text-[10px] font-bold text-gray-800 text-center">{theme.name}</p></div>
-          </button>
-        ))}
+      <div>
+        <h3 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wider">Thèmes Prédéfinis</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {DEFAULT_THEMES.map(theme => (
+            <button key={theme.id} onClick={() => setProfile({...profile, theme})} className={`group relative aspect-[4/5] rounded-xl border-2 transition-all overflow-hidden ${profile.theme.id === theme.id ? 'border-indigo-600 ring-2 ring-indigo-600 ring-offset-2' : 'border-transparent hover:border-gray-300'}`}>
+              <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom right, ${theme.backgroundStart}, ${theme.backgroundEnd})` }}></div>
+              <div className="absolute inset-x-0 bottom-0 p-2 bg-white/90 backdrop-blur-sm"><p className="text-[10px] font-bold text-gray-800 text-center">{theme.name}</p></div>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

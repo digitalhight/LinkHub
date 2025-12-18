@@ -3,10 +3,9 @@ import { UserProfile, EditorTab } from './types';
 import { INITIAL_PROFILE } from './constants';
 import PhonePreview from './components/PhonePreview';
 import EditorPanel from './components/EditorPanel';
-import PublicProfile from './components/PublicProfile';
 import { AuthModal } from './components/AuthModal';
 import { ConfigModal } from './components/ConfigModal';
-import { supabase, isSupabaseConfigured } from './utils/supabaseClient';
+import { supabase, isSupabaseConfigured, clearSupabaseConfig } from './utils/supabaseClient';
 
 const App: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile>(INITIAL_PROFILE);
@@ -17,39 +16,8 @@ const App: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
-  
-  const [isPublicView, setIsPublicView] = useState(false);
-  const [publicUsername, setPublicUsername] = useState<string | null>(null);
-  const [notFound, setNotFound] = useState(false);
-
-  // Déterminer la route au chargement
-  useEffect(() => {
-    const path = window.location.pathname.split('/').filter(Boolean);
-    
-    if (path.length > 0) {
-      const segment = path[0].toLowerCase();
-      // On exclut les fichiers statiques et les routes réservées
-      const isFile = segment.includes('.');
-      const isReserved = ['index.html', 'auth', 'login', 'api', 'admin', 'https:', 'http:'].includes(segment);
-      const isLikelyUsername = /^[a-zA-Z0-9_]{3,20}$/.test(segment);
-
-      if (!isFile && !isReserved && isLikelyUsername) {
-        setIsPublicView(true);
-        setPublicUsername(segment);
-        return;
-      }
-    }
-    
-    setIsPublicView(false);
-    setPublicUsername(null);
-  }, []);
 
   useEffect(() => {
-    if (isPublicView && publicUsername) {
-      fetchPublicProfile(publicUsername);
-      return;
-    }
-
     if (!isSupabaseConfigured()) {
       setIsConfigModalOpen(true);
       setLoading(false);
@@ -64,7 +32,7 @@ const App: React.FC = () => {
           await fetchProfile(session.user.id);
         }
       } catch (err) {
-        console.warn("Session check failed");
+        console.warn("Session check failed", err);
       } finally {
         setLoading(false);
       }
@@ -84,41 +52,14 @@ const App: React.FC = () => {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [userId, isPublicView, publicUsername]);
+  }, [userId]);
 
-  const fetchPublicProfile = async (username: string) => {
-    if (!isSupabaseConfigured()) {
-      setLoading(false);
-      return;
-    }
-    
-    setLoading(true);
-    setNotFound(false);
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('username', username.toLowerCase().trim())
-        .maybeSingle();
-
-      if (error || !data) {
-        setNotFound(true);
-      } else {
-        setProfile({
-          name: data.name || username,
-          username: data.username,
-          bio: data.bio || '',
-          avatarUrl: data.avatar_url || '',
-          phone: data.phone || '',
-          email: data.email || '',
-          links: data.links || [],
-          theme: data.theme || INITIAL_PROFILE.theme,
-        });
-      }
-    } catch (err) {
-      setNotFound(true);
-    } finally {
-      setLoading(false);
+  const handleLoginSuccess = async (newUserId: string, isNewUser: boolean) => {
+    setUserId(newUserId);
+    if (isNewUser) {
+      await saveChanges(newUserId);
+    } else {
+      await fetchProfile(newUserId);
     }
   };
 
@@ -129,7 +70,15 @@ const App: React.FC = () => {
         .from('profiles')
         .select('*')
         .eq('id', id)
-        .maybeSingle();
+        .single();
+
+      if (error) {
+        if (error.code !== 'PGRST116') {
+           console.error("Error fetching profile:", error.message);
+        }
+        setLoading(false);
+        return;
+      }
 
       if (data) {
         setProfile({
@@ -143,8 +92,8 @@ const App: React.FC = () => {
           theme: data.theme || INITIAL_PROFILE.theme,
         });
       }
-    } catch (err) {
-      console.warn('Profile fetch ignored');
+    } catch (err: any) {
+      console.warn('Could not fetch profile data:', err.message);
     } finally {
       setLoading(false);
     }
@@ -155,12 +104,17 @@ const App: React.FC = () => {
        setIsAuthModalOpen(true);
        return;
     }
+    await saveChanges(userId);
+  };
+
+  const saveChanges = async (targetUserId: string) => {
+    if (!targetUserId) return;
     setSaving(true);
     setSaveSuccess(false);
 
     try {
       const payload = {
-        id: userId,
+        id: targetUserId,
         name: profile.name,
         username: profile.username.toLowerCase().trim(),
         bio: profile.bio,
@@ -172,67 +126,57 @@ const App: React.FC = () => {
         updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase.from('profiles').upsert(payload);
-      if (error) throw error;
+      const { error } = await supabase
+        .from('profiles')
+        .upsert(payload);
 
+      if (error) throw error;
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err: any) {
-      alert(`Erreur : ${err.message || 'Sauvegarde échouée'}`);
+      console.error('Save failed:', err);
+      alert(`Erreur lors de la sauvegarde : ${err.message}`);
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) {
+  if (loading && !profile) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl animate-bounce">W</div>
-          <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Chargement</p>
-        </div>
+      <div className="h-screen w-screen flex items-center justify-center bg-gray-50 text-indigo-600">
+        <svg className="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
       </div>
     );
-  }
-
-  if (isPublicView) {
-    return <PublicProfile profile={profile} notFound={notFound} />;
   }
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-gray-50 text-slate-900 font-sans">
       <ConfigModal isOpen={isConfigModalOpen} />
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-        onSuccess={(id) => { setUserId(id); fetchProfile(id); }} 
-      />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={handleLoginSuccess} />
       
-      <div className="flex-1 flex flex-col min-w-0 z-10 bg-white border-r border-gray-200 shadow-xl">
+      <div className="flex-1 flex flex-col min-w-0 z-10 bg-white border-r border-gray-200">
         <header className="h-16 border-b border-gray-200 bg-white flex items-center px-6 flex-shrink-0">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">W</div>
             <h1 className="font-bold text-xl tracking-tight text-slate-900">Women<span className="text-indigo-600">Cards</span></h1>
           </div>
           <div className="ml-auto flex gap-3 items-center">
-             {!userId && <button onClick={() => setIsAuthModalOpen(true)} className="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors shadow-sm">Connexion</button>}
-             {userId && <button onClick={() => { supabase.auth.signOut(); setUserId(''); setProfile(INITIAL_PROFILE); }} className="text-xs font-medium text-gray-400 hover:text-red-600 px-2 transition-colors">Sortir</button>}
-             <button onClick={handleSave} disabled={saving} className={`text-xs font-semibold px-4 py-2 rounded-lg transition-all min-w-[120px] shadow-sm ${saveSuccess ? 'bg-green-600 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50'}`}>
-              {saving ? '...' : saveSuccess ? 'Enregistré' : 'Enregistrer'}
+             {!userId && <button onClick={() => setIsAuthModalOpen(true)} className="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors">Log In / Sign Up</button>}
+             {userId && <button onClick={() => { supabase.auth.signOut(); setProfile(INITIAL_PROFILE); }} className="text-xs font-medium text-gray-500 hover:text-red-600 px-2 transition-colors border border-transparent hover:border-gray-200 rounded py-1">Sign Out</button>}
+             <button onClick={handleSave} disabled={saving} className={`text-xs font-semibold px-4 py-2 rounded-lg transition-all min-w-[120px] ${saveSuccess ? 'bg-green-600 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50'}`}>
+              {saving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Changes'}
             </button>
-            <button className="p-2 text-gray-300 hover:text-indigo-500 transition-colors" onClick={() => setIsConfigModalOpen(true)}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-            </button>
+            <button className="text-xs font-semibold text-gray-400 hover:text-red-500 transition-colors px-2" onClick={clearSupabaseConfig}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
           </div>
         </header>
-        <div className="flex-1 overflow-hidden relative bg-gray-50/50">
+        <div className="flex-1 overflow-hidden relative">
           <EditorPanel profile={profile} setProfile={setProfile} activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
       </div>
 
       <div className="hidden lg:flex flex-1 bg-gray-100 items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
-        <div className="relative z-10 scale-[0.85] xl:scale-100 transition-transform duration-500">
+        <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50"></div>
+        <div className="relative z-10 scale-[0.9] xl:scale-100 transition-transform">
            <PhonePreview profile={profile} />
         </div>
       </div>
