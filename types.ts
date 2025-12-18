@@ -19,6 +19,7 @@ export interface ThemeConfig {
 
 export interface UserProfile {
   name: string;
+  username: string;
   bio: string;
   avatarUrl: string;
   phone?: string;
