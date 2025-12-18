@@ -4,22 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WomenCards - Votre VCard Digitale</title>
+    <!-- Utilisation de Tailwind via CDN standard -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
-      // Protection contre les erreurs de scripts externes (extensions ou injections proxy)
-      window.onerror = function(message, source, lineno, colno, error) {
-        if (source && (source.includes('share-modal') || source.includes('extension') || source.includes('cdn'))) {
-          console.warn('Ignored external script error:', message);
-          return true; 
-        }
+      // Force le repli sur HTTP/1.1 si QUIC échoue et ignore les erreurs de scripts tiers
+      window.onerror = function(msg, url, line, col, error) {
+        if (url && (url.includes('extension') || url.includes('share-modal'))) return true;
+        console.error("App Error:", msg, "@", url, ":", line);
       };
     </script>
     <style>
-      body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow: hidden; }
+      body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background-color: #f9fafb; }
       #root { min-height: 100vh; display: flex; flex-direction: column; }
-      ::-webkit-scrollbar { width: 6px; }
-      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
     </style>
     <script type="importmap">
     {
@@ -33,7 +31,7 @@
     }
     </script>
   </head>
-  <body class="bg-gray-50 text-slate-900">
+  <body>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
   </body>
