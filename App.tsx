@@ -25,18 +25,27 @@ const App: React.FC = () => {
   // Détection du profil via le Hash (#/username) ou le Pathname (/username)
   useEffect(() => {
     const checkRouting = () => {
-      // 1. Vérifier le Hash (Solution anti-404 pour Nginx)
+      // 1. On vérifie d'abord le Pathname (URL propre)
+      const pathSegments = window.location.pathname.split('/').filter(Boolean);
+      let candidate = pathSegments.length > 0 ? pathSegments[0] : null;
+
+      // 2. Si rien dans le path, on regarde le Hash (fallback)
       const hash = window.location.hash.replace('#/', '').replace('#', '').trim();
       
-      // 2. Vérifier le Path (Solution standard SPA)
-      const pathSegments = window.location.pathname.split('/').filter(Boolean);
-      const pathSegment = pathSegments.length > 0 ? pathSegments[0] : null;
-
-      const candidate = hash || pathSegment;
+      if (!candidate && hash) {
+        candidate = hash;
+        // On "nettoie" l'URL dans la barre d'adresse pour supprimer le # si possible
+        try {
+          window.history.replaceState(null, '', `/${hash}`);
+        } catch (e) {
+          console.warn("Could not rewrite URL");
+        }
+      }
 
       if (candidate) {
         const segment = candidate.toLowerCase();
-        const isReserved = ['index.html', 'auth', 'login', 'api', 'admin', 'https:', 'http:'].includes(segment);
+        // Liste d'exclusions pour éviter de prendre des fichiers ou routes système pour des pseudos
+        const isReserved = ['index.html', 'auth', 'login', 'api', 'admin', 'assets', 'static'].includes(segment);
         const isFile = segment.includes('.');
 
         if (!isReserved && !isFile && segment.length >= 3) {
@@ -49,8 +58,12 @@ const App: React.FC = () => {
     };
 
     checkRouting();
+    window.addEventListener('popstate', checkRouting);
     window.addEventListener('hashchange', checkRouting);
-    return () => window.removeEventListener('hashchange', checkRouting);
+    return () => {
+      window.removeEventListener('popstate', checkRouting);
+      window.removeEventListener('hashchange', checkRouting);
+    };
   }, []);
 
   useEffect(() => {

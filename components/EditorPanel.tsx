@@ -175,7 +175,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Nom d'utilisateur (unique)</label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Nom d'utilisateur (pseudo unique)</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 text-sm">
                 @
@@ -206,11 +206,24 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ profile, setProfile, activeTa
                    {isUsernameAvailable === false ? 'Ce nom est déjà pris' : 
                     isUsernameAvailable === true ? 'Ce nom est disponible !' : 'Minimum 3 caractères'}
                  </p>
-                 <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-lg">
-                    <p className="text-[10px] text-indigo-400 font-medium uppercase tracking-tighter mb-0.5">Lien public de votre page :</p>
-                    <code className="text-xs text-indigo-700 font-bold break-all">
-                      {window.location.origin}/#/{profile.username || '...'}
-                    </code>
+                 <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
+                    <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-tight mb-1">Votre lien direct (sans #) :</p>
+                    <div className="flex items-center justify-between gap-2">
+                      <code className="text-xs text-indigo-700 font-extrabold break-all">
+                        {window.location.origin}/{profile.username || '...'}
+                      </code>
+                      <button 
+                        onClick={() => {
+                          const url = `${window.location.origin}/${profile.username}`;
+                          navigator.clipboard.writeText(url);
+                          alert("Lien copié !");
+                        }}
+                        className="p-1.5 bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors"
+                        title="Copier le lien"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                      </button>
+                    </div>
                  </div>
                </div>
             )}

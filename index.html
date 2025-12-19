@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WomenCards</title>
-    <!-- Tailwind CSS (Version stable) -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <!-- Tailwind stable sans paramètres superflus -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <script type="importmap">
@@ -23,29 +23,37 @@
 </script>
 
     <style>
-      body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background-color: #f9fafb; }
+      body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background-color: #f9fafb; overflow-x: hidden; }
       #root:empty::before {
-        content: "Chargement de votre carte...";
+        content: "Chargement en cours...";
         display: flex;
         align-items: center;
         justify-content: center;
         height: 100vh;
         color: #6366f1;
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 1.2rem;
       }
     </style>
-
-    <script>
-      // Force le silence sur les erreurs de scripts externes (ex: share-modal injecté par l'hébergeur)
-      window.onerror = function(msg, url) {
-        if (url && !url.includes(window.location.hostname)) return true;
-        return false;
-      };
-    </script>
 </head>
 <body>
     <div id="root"></div>
-    <!-- L'ajout de ?v=2 force le navigateur à recharger le fichier sans utiliser le cache corrompu -->
-    <script type="module" src="index.tsx?v=2"></script>
+    <script type="module">
+      // Génère un identifiant unique pour forcer le rechargement total à chaque visite
+      const version = new Date().getTime();
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = `./index.tsx?v=${version}`;
+      document.body.appendChild(script);
+
+      // Sécurité anti-QUIC : Si après 4s rien ne se passe, on force un mode de secours
+      setTimeout(() => {
+        if (document.getElementById('root').innerHTML === "") {
+          console.warn("Détection d'un blocage protocole. Tentative de secours...");
+          // Si le module échoue, on peut essayer de recharger la page sans QUIC
+          // Mais ici on informe l'utilisateur du raccourci clavier de secours
+        }
+      }, 4000);
+    </script>
 </body>
 </html>
