@@ -18,14 +18,13 @@ export async function generateBio(name: string, currentBio: string): Promise<str
     Make it catchy and use one emoji if appropriate. Return ONLY the text.`;
     
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
     });
 
-    return response.text.trim();
+    return response.text?.trim() || "Creative professional exploring new ideas. ✨";
   } catch (error) {
     console.error("AI Bio Generation Error:", error);
-    // Don't throw, just return generic text to keep app stable
     return "Creative professional exploring new ideas. ✨";
   }
 }
@@ -37,7 +36,7 @@ export async function generateTheme(description: string): Promise<Partial<ThemeC
     The theme needs a start/end gradient for the background, a button background color, button text color, and a general text color.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -58,7 +57,7 @@ export async function generateTheme(description: string): Promise<Partial<ThemeC
     const text = response.text;
     if (!text) throw new Error("No data returned");
     
-    return JSON.parse(text);
+    return JSON.parse(text.trim());
   } catch (error) {
     console.error("AI Theme Generation Error:", error);
     throw new Error("Failed to generate theme.");

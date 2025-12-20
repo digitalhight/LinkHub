@@ -44,30 +44,36 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen }) => {
             required
           />
 
-          <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl">
-            <p className="text-[11px] font-bold text-blue-700 uppercase mb-2 flex items-center gap-1">
+          <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-xl">
+            <p className="text-[11px] font-bold text-indigo-700 uppercase mb-2 flex items-center gap-1">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              URL Propres (sans #)
+              Corriger l'erreur 404 Nginx
             </p>
-            <p className="text-[10px] text-blue-600 leading-relaxed">
-              Pour que <code>votre-site.com/karima</code> fonctionne sans le <b>#</b>, votre serveur (Nginx/Apache) doit rediriger toutes les requêtes vers <code>index.html</code>.
+            <p className="text-[10px] text-indigo-600 leading-relaxed mb-3">
+              Pour que <code>/votre-nom</code> fonctionne sans 404, ajoutez ceci à votre config Nginx :
+            </p>
+            <pre className="bg-indigo-900 text-indigo-100 p-2 rounded text-[9px] font-mono overflow-x-auto">
+{`location / {
+  try_files $uri $uri/ /index.html;
+}`}
+            </pre>
+            <p className="text-[10px] text-indigo-500 mt-2">
+              Sinon, utilisez le mode hash : <code>votre-site.com/#/nom</code>
             </p>
           </div>
 
           <div className="bg-red-50 border border-red-100 p-4 rounded-xl">
             <p className="text-[11px] font-bold text-red-700 uppercase mb-2 flex items-center gap-1">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-              Action SQL requise
+              Structure SQL
             </p>
-            <p className="text-[10px] text-red-600 mb-2">Copiez ce code dans le <b>SQL Editor</b> de Supabase :</p>
             <pre className="bg-white p-2 rounded border border-red-200 font-mono text-[9px] overflow-x-auto select-all">
 {`ALTER TABLE profiles 
 ADD COLUMN IF NOT EXISTS username TEXT UNIQUE,
 ADD COLUMN IF NOT EXISTS phone TEXT,
-ADD COLUMN IF NOT EXISTS email TEXT;
-
-CREATE POLICY "Allow public read" 
-ON profiles FOR SELECT USING (true);`}
+ADD COLUMN IF NOT EXISTS email TEXT,
+ADD COLUMN IF NOT EXISTS links JSONB,
+ADD COLUMN IF NOT EXISTS theme JSONB;`}
             </pre>
           </div>
 
@@ -75,7 +81,7 @@ ON profiles FOR SELECT USING (true);`}
             type="submit" 
             className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition-all"
           >
-            Sauvegarder la configuration
+            Enregistrer & Redémarrer
           </button>
         </form>
       </div>
