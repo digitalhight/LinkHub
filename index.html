@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WomenCards</title>
+    <title>WomenCards | Bio-Link pour Créatrices</title>
     <!-- Tailwind stable sans paramètres superflus -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script type="importmap">
 {
@@ -23,37 +23,50 @@
 </script>
 
     <style>
-      body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background-color: #f9fafb; overflow-x: hidden; }
+      body { 
+        font-family: 'Plus Jakarta Sans', sans-serif; 
+        margin: 0; 
+        padding: 0; 
+        background-color: #F8F9FF; 
+        overflow-x: hidden; 
+      }
       #root:empty::before {
-        content: "Chargement en cours...";
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: #F8F9FF;
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 100vh;
-        color: #6366f1;
-        font-weight: 700;
-        font-size: 1.2rem;
+        z-index: 1000;
+      }
+      #root:empty::after {
+        content: "W";
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 3rem;
+        font-weight: 900;
+        color: #3D5AFE;
+        animation: pulse 1.5s infinite;
+        z-index: 1001;
+      }
+      @keyframes pulse {
+        0% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.9); }
+        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        100% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.9); }
       }
     </style>
 </head>
 <body>
     <div id="root"></div>
     <script type="module">
-      // Génère un identifiant unique pour forcer le rechargement total à chaque visite
       const version = new Date().getTime();
       const script = document.createElement('script');
       script.type = 'module';
       script.src = `./index.tsx?v=${version}`;
       document.body.appendChild(script);
-
-      // Sécurité anti-QUIC : Si après 4s rien ne se passe, on force un mode de secours
-      setTimeout(() => {
-        if (document.getElementById('root').innerHTML === "") {
-          console.warn("Détection d'un blocage protocole. Tentative de secours...");
-          // Si le module échoue, on peut essayer de recharger la page sans QUIC
-          // Mais ici on informe l'utilisateur du raccourci clavier de secours
-        }
-      }, 4000);
     </script>
 </body>
 </html>

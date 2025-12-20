@@ -4,6 +4,7 @@ import { INITIAL_PROFILE } from './constants';
 import PhonePreview from './components/PhonePreview';
 import EditorPanel from './components/EditorPanel';
 import PublicProfile from './components/PublicProfile';
+import LandingPage from './components/LandingPage';
 import { AuthModal } from './components/AuthModal';
 import { ConfigModal } from './components/ConfigModal';
 import { supabase, isSupabaseConfigured } from './utils/supabaseClient';
@@ -25,16 +26,13 @@ const App: React.FC = () => {
   // Détection du profil via le Hash (#/username) ou le Pathname (/username)
   useEffect(() => {
     const checkRouting = () => {
-      // 1. On vérifie d'abord le Pathname (URL propre)
       const pathSegments = window.location.pathname.split('/').filter(Boolean);
       let candidate = pathSegments.length > 0 ? pathSegments[0] : null;
 
-      // 2. Si rien dans le path, on regarde le Hash (fallback)
       const hash = window.location.hash.replace('#/', '').replace('#', '').trim();
       
       if (!candidate && hash) {
         candidate = hash;
-        // On "nettoie" l'URL dans la barre d'adresse pour supprimer le # si possible
         try {
           window.history.replaceState(null, '', `/${hash}`);
         } catch (e) {
@@ -44,7 +42,6 @@ const App: React.FC = () => {
 
       if (candidate) {
         const segment = candidate.toLowerCase();
-        // Liste d'exclusions pour éviter de prendre des fichiers ou routes système pour des pseudos
         const isReserved = ['index.html', 'auth', 'login', 'api', 'admin', 'assets', 'static'].includes(segment);
         const isFile = segment.includes('.');
 
@@ -69,12 +66,6 @@ const App: React.FC = () => {
   useEffect(() => {
     if (isPublicView && publicUsername) {
       fetchPublicProfile(publicUsername);
-      return;
-    }
-
-    if (!isSupabaseConfigured()) {
-      setIsConfigModalOpen(true);
-      setLoading(false);
       return;
     }
 
@@ -168,12 +159,7 @@ const App: React.FC = () => {
 
       const { error } = await supabase.from('profiles').upsert(payload);
       
-      if (error) {
-        if (error.message.includes('email')) {
-          throw new Error("La colonne 'email' est manquante. Cliquez sur l'icône crayon pour le script SQL.");
-        }
-        throw error;
-      }
+      if (error) throw error;
 
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
@@ -199,6 +185,21 @@ const App: React.FC = () => {
     return <PublicProfile profile={profile} notFound={notFound} />;
   }
 
+  // Si non connecté et pas sur une vue publique, montrer la landing page
+  if (!userId) {
+    return (
+      <>
+        <AuthModal 
+          isOpen={isAuthModalOpen} 
+          onClose={() => setIsAuthModalOpen(false)} 
+          onSuccess={(id) => { setUserId(id); fetchProfile(id); }} 
+        />
+        <LandingPage onGetStarted={() => setIsAuthModalOpen(true)} />
+      </>
+    );
+  }
+
+  // Utilisateur connecté : Montrer l'éditeur
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-gray-50 text-slate-900">
       <ConfigModal isOpen={isConfigModalOpen} />
@@ -215,8 +216,7 @@ const App: React.FC = () => {
             <h1 className="font-bold text-lg hidden sm:block">WomenCards</h1>
           </div>
           <div className="flex gap-2 items-center">
-             {!userId && <button onClick={() => setIsAuthModalOpen(true)} className="text-xs font-bold text-white bg-indigo-600 px-4 py-2 rounded-lg">Connexion</button>}
-             {userId && <button onClick={() => { supabase.auth.signOut(); setUserId(''); setProfile(INITIAL_PROFILE); }} className="text-xs font-medium text-gray-400 hover:text-red-600 px-2 transition-colors">Sortir</button>}
+             <button onClick={() => { supabase.auth.signOut(); setUserId(''); setProfile(INITIAL_PROFILE); }} className="text-xs font-medium text-gray-400 hover:text-red-600 px-2 transition-colors">Sortir</button>
              <button onClick={handleSave} disabled={saving} className={`text-xs font-bold px-4 py-2 rounded-lg transition-all min-w-[100px] ${saveSuccess ? 'bg-green-500 text-white' : 'bg-indigo-600 text-white disabled:opacity-50'}`}>
               {saving ? '...' : saveSuccess ? 'OK !' : 'Enregistrer'}
             </button>
