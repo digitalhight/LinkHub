@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WomenCards | Bio-Link pour Créatrices</title>
-    <!-- Tailwind stable sans paramètres superflus -->
+    <!-- Tailwind stable -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -30,43 +30,32 @@
         background-color: #F8F9FF; 
         overflow-x: hidden; 
       }
-      #root:empty::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background: #F8F9FF;
+      /* Style de l'écran de chargement initial */
+      #root:empty {
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 1000;
+        height: 100vh;
+        width: 100vw;
+        background: #F8F9FF;
       }
       #root:empty::after {
         content: "W";
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 3rem;
+        font-size: 4rem;
         font-weight: 900;
         color: #3D5AFE;
         animation: pulse 1.5s infinite;
-        z-index: 1001;
       }
       @keyframes pulse {
-        0% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.9); }
-        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-        100% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.9); }
+        0% { opacity: 0.3; transform: scale(0.9); }
+        50% { opacity: 1; transform: scale(1.1); }
+        100% { opacity: 0.3; transform: scale(0.9); }
       }
     </style>
 </head>
 <body>
     <div id="root"></div>
-    <script type="module">
-      const version = new Date().getTime();
-      const script = document.createElement('script');
-      script.type = 'module';
-      script.src = `./index.tsx?v=${version}`;
-      document.body.appendChild(script);
-    </script>
+    <!-- Chargement direct sans versioning pour permettre au bundler de transformer le TSX -->
+    <script type="module" src="index.tsx"></script>
 </body>
 </html>

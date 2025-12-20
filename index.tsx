@@ -2,10 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-const startApp = () => {
-  const container = document.getElementById('root');
-  if (!container) return;
+const container = document.getElementById('root');
 
+if (container) {
   try {
     const root = ReactDOM.createRoot(container);
     root.render(
@@ -13,16 +12,13 @@ const startApp = () => {
         <App />
       </React.StrictMode>
     );
-    console.log("App WomenCards démarrée avec succès.");
+    console.log("WomenCards: Application chargée.");
   } catch (error) {
-    console.error("Erreur fatale au démarrage:", error);
-    container.innerHTML = `<div style="padding:20px;text-align:center;">Une erreur est survenue. Veuillez rafraîchir avec CTRL+F5.</div>`;
+    console.error("WomenCards: Erreur de rendu:", error);
+    container.innerHTML = `<div style="padding:40px; text-align:center; font-family:sans-serif;">
+      <h1 style="color:#3D5AFE">Oups !</h1>
+      <p>Une erreur est survenue lors du chargement.</p>
+      <button onclick="window.location.reload()" style="padding:10px 20px; background:#3D5AFE; color:white; border:none; border-radius:8px; cursor:pointer;">Réessayer</button>
+    </div>`;
   }
-};
-
-// On s'assure que le DOM est prêt
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  startApp();
-} else {
-  window.addEventListener('DOMContentLoaded', startApp);
 }
