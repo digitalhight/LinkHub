@@ -7,7 +7,6 @@ import PublicProfile from './components/PublicProfile';
 import LandingPage from './components/LandingPage';
 import AdminDashboard from './components/AdminDashboard';
 import { AuthModal } from './components/AuthModal';
-import { ConfigModal } from './components/ConfigModal';
 import { supabase, isSupabaseConfigured } from './utils/supabaseClient';
 
 const App: React.FC = () => {
@@ -18,12 +17,11 @@ const App: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
   const [userAuthEmail, setUserAuthEmail] = useState<string>('');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [activeEditorTab, setActiveEditorTab] = useState<'profile' | 'links' | 'theme'>('profile');
   
   const [isPublicView, setIsPublicView] = useState(false);
   const [isAdminView, setIsAdminView] = useState(false);
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // Pour mobile
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); 
   const [publicUsername, setPublicUsername] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
@@ -68,12 +66,7 @@ const App: React.FC = () => {
 
       setLoading(true);
       try {
-        const sessionPromise = supabase.auth.getSession();
-        const timeoutPromise = new Error("Timeout Supabase");
-        
-        // Simulation d'un timeout ou check rapide
-        const result: any = await sessionPromise;
-        const session = result?.data?.session;
+        const { data: { session } } = await supabase.auth.getSession();
 
         if (session) {
           setUserId(session.user.id);
@@ -81,8 +74,8 @@ const App: React.FC = () => {
           await fetchProfile(session.user.id);
         }
       } catch (err: any) {
-        console.warn("Erreur d'initialisation (Base de données possiblement hors-ligne):", err.message);
-        setDbError("La base de données semble indisponible.");
+        console.warn("Erreur d'initialisation:", err.message);
+        setDbError("La base de données est actuellement indisponible.");
       } finally {
         setLoading(false);
       }
@@ -170,17 +163,13 @@ const App: React.FC = () => {
     }
   };
 
+  const isAdmin = profile.is_admin || userAuthEmail === 'digitalhight2025@gmail.com';
+
   if (loading) {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#0A0118] z-[9999]">
-        <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white font-black text-3xl animate-pulse shadow-[0_0_40px_rgba(168,85,247,0.4)]">W</div>
-        <p className="mt-8 text-[10px] font-black uppercase tracking-[0.6em] animate-pulse">Initialisation...</p>
-        <button 
-          onClick={() => setIsConfigModalOpen(true)}
-          className="mt-12 text-[9px] font-black text-white/20 hover:text-white uppercase tracking-widest transition-colors underline underline-offset-4"
-        >
-          Accéder à la configuration (Debug)
-        </button>
+        <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white font-black text-3xl animate-pulse shadow-[0_0_40px_rgba(168,85,247,0.4)] font-['Bricolage_Grotesque']">W</div>
+        <p className="mt-8 text-[10px] font-black uppercase tracking-[0.6em] animate-pulse">Chargement...</p>
       </div>
     );
   }
@@ -190,16 +179,7 @@ const App: React.FC = () => {
   }
 
   if (isAdminView) {
-    const isAdmin = profile.is_admin || userAuthEmail === 'digitalhight2025@gmail.com';
-    if (!userId) { window.location.href = '/'; return null; }
-    if (!isAdmin) {
-      return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[#0A0118] p-10 text-white">
-          <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter">Accès Restreint</h2>
-          <button onClick={() => window.location.href = '/'} className="px-10 py-4 bg-white text-black rounded-full font-black text-xs uppercase tracking-widest shadow-xl">Retour</button>
-        </div>
-      );
-    }
+    if (!userId || !isAdmin) { window.location.href = '/'; return null; }
     return <AdminDashboard currentUser={profile} />;
   }
 
@@ -207,12 +187,10 @@ const App: React.FC = () => {
     return (
       <>
         <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={(id) => { setUserId(id); fetchProfile(id); }} />
-        <ConfigModal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} />
         <LandingPage onGetStarted={() => setIsAuthModalOpen(true)} />
         {dbError && !isSupabaseConfigured() && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-red-500/10 border border-red-500/20 backdrop-blur-xl px-6 py-3 rounded-full flex items-center gap-4 z-50">
-             <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">Base de données non configurée ou inactive</span>
-             <button onClick={() => setIsConfigModalOpen(true)} className="bg-white text-red-500 text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">Réparer</button>
+             <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">Connexion serveur indisponible</span>
           </div>
         )}
       </>
@@ -224,7 +202,6 @@ const App: React.FC = () => {
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#0A0118] font-['Plus_Jakarta_Sans'] text-white">
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={(id) => { setUserId(id); fetchProfile(id); }} />
-      <ConfigModal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} />
       
       {/* Header Responsif */}
       <header className="h-16 lg:h-20 border-b border-white/5 bg-[#0A0118]/80 backdrop-blur-3xl flex items-center px-4 lg:px-8 justify-between flex-shrink-0 z-20">
@@ -234,9 +211,20 @@ const App: React.FC = () => {
         </div>
         
         <div className="flex gap-2 lg:gap-6 items-center">
-          <button onClick={() => setIsConfigModalOpen(true)} className="w-8 h-8 flex items-center justify-center text-white/20 hover:text-white transition-colors" title="Configuration">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
+          {/* BOUTON SUPER ADMIN - Visible uniquement pour Amina/Admin */}
+          {isAdmin && (
+            <button 
+              onClick={() => {
+                setIsAdminView(true);
+                window.history.pushState({}, '', '/admin');
+              }}
+              className="flex items-center gap-2 px-3 lg:px-4 py-1.5 lg:py-2 bg-amber-500/10 border border-amber-500/20 rounded-full hover:bg-amber-500/20 transition-all group mr-2"
+            >
+              <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-amber-500 rounded-full animate-pulse"></div>
+              <span className="text-[8px] lg:text-[10px] font-black text-amber-500 uppercase tracking-widest group-hover:text-amber-400">Super Admin</span>
+            </button>
+          )}
+
           <button onClick={() => { supabase.auth.signOut().then(() => { setUserId(''); window.location.href = '/'; }); }} className="text-[9px] lg:text-[10px] font-black text-gray-500 hover:text-white uppercase tracking-widest transition-colors hidden sm:block">Déconnexion</button>
           <button 
             onClick={handleSave} 
@@ -249,7 +237,7 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 flex overflow-hidden">
-        {/* Sidebar Unique contenant tous les menus : Profil, Liens et Thème */}
+        {/* Sidebar Editor */}
         <div className="w-full lg:w-[450px] bg-[#120526]/40 border-r border-white/5 flex flex-col flex-shrink-0 overflow-hidden backdrop-blur-3xl">
           <div className="px-6 lg:px-10 pt-6 lg:pt-8 pb-4 border-b border-white/5 flex gap-8 lg:gap-12 overflow-x-auto scrollbar-hide">
             <button 
@@ -291,7 +279,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Preview Container - Plus spacieux car la sidebar droite a été supprimée */}
+        {/* Preview Container */}
         <div className="hidden lg:flex flex-1 bg-[#05010D] items-center justify-center relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[160px]"></div>
           <div className="relative z-10 flex flex-col items-center gap-8 animate-in zoom-in duration-1000">
@@ -313,7 +301,7 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* MOBILE PREVIEW BUTTON & MODAL */}
+      {/* MOBILE PREVIEW BUTTON */}
       <button 
         onClick={() => setIsPreviewModalOpen(true)}
         className="lg:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full shadow-2xl flex items-center justify-center text-white z-50 border-2 border-white/20 active:scale-90 transition-transform"
