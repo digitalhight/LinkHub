@@ -17,13 +17,13 @@ const PublicProfile: React.FC<PublicProfileProps> = ({ profile, notFound }) => {
 
   if (notFound) {
     return (
-      <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 bg-gray-50 text-gray-900 font-['Plus_Jakarta_Sans']">
-        <div className="w-20 h-20 bg-indigo-50 text-indigo-500 rounded-3xl flex items-center justify-center mb-6">
+      <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 bg-[#0A0118] text-white font-['Plus_Jakarta_Sans']">
+        <div className="w-20 h-20 bg-purple-500/10 text-purple-500 rounded-3xl flex items-center justify-center mb-6">
           <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         </div>
-        <h1 className="text-2xl font-black mb-2">Profil Introuvable</h1>
+        <h1 className="text-2xl font-black mb-2 uppercase tracking-tighter">Profil Introuvable</h1>
         <p className="text-sm text-gray-500 mb-8 text-center max-w-xs font-medium">Ce lien ne correspond à aucun compte WomenCards actif.</p>
-        <a href="/" className="px-8 py-4 bg-[#3D5AFE] text-white font-black rounded-2xl shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 text-sm uppercase tracking-widest">Créer mon profil</a>
+        <a href="/" className="px-8 py-4 bg-white text-black font-black rounded-2xl shadow-xl hover:scale-105 transition-all active:scale-95 text-sm uppercase tracking-widest">Créer mon profil</a>
       </div>
     );
   }
@@ -115,8 +115,8 @@ const PublicProfile: React.FC<PublicProfileProps> = ({ profile, notFound }) => {
           <a href="/" className="flex flex-col items-center gap-2 group">
             <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 group-hover:opacity-100 transition-opacity">Créé avec</span>
             <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/10 opacity-40 group-hover:opacity-100 transition-all">
-               <div className="w-5 h-5 bg-[#3D5AFE] rounded-md flex items-center justify-center text-white font-black text-[10px]">W</div>
-               <span className="text-xs font-black tracking-tighter">womencards.</span>
+               <div className="w-5 h-5 bg-[#A855F7] rounded-md flex items-center justify-center text-white font-black text-[10px]">W</div>
+               <span className="text-xs font-black tracking-tighter">women.cards</span>
             </div>
           </a>
         </div>

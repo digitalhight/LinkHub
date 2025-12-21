@@ -58,26 +58,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-px h-[1000px] bg-gradient-to-b from-transparent via-purple-500/20 to-transparent rotate-45"></div>
       </div>
 
-      {/* Navigation - Minimal Version */}
+      {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-[#0A0118]/60 backdrop-blur-2xl border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-10 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-transform hover:rotate-12 cursor-pointer">W</div>
             <span className="font-black text-2xl tracking-tighter">WomenCards<span className="text-purple-500">.</span></span>
           </div>
-          <div className="flex items-center gap-6">
-            <button 
-              onClick={onGetStarted}
-              className="bg-white text-[#0A0118] px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95 border border-white"
-            >
-              Démarrer
-            </button>
-          </div>
+          <button 
+            onClick={onGetStarted}
+            className="bg-white text-[#0A0118] px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95 border border-white"
+          >
+            Démarrer
+          </button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-48 pb-20 px-6 lg:px-20 min-h-screen flex items-center">
+      <section className="relative pt-48 pb-20 px-6 lg:px-20 min-h-[90vh] flex items-center">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-20 items-center">
           
           {/* Left Content */}
@@ -89,24 +87,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </h1>
             
             <p className="text-lg lg:text-xl text-gray-400 mb-14 leading-relaxed max-w-xl font-medium">
-              Pour les femmes professionnelles actives sur plusieurs plateformes et qui veulent unifier leur présence en un seul lien.
+              Pour les femmes professionnelles actives sur plusieurs plateformes et qui veulent unifier leur présence en un seul lien sur <span className="text-white font-bold">women.cards</span>.
             </p>
             
-            <div className="flex items-center">
-              <button 
-                onClick={onGetStarted}
-                className="w-full sm:w-auto px-14 py-6 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-3xl font-black text-lg hover:shadow-[0_0_50px_rgba(147,51,234,0.3)] transition-all active:scale-95 group flex items-center justify-center gap-3"
-              >
-                Commencer maintenant
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </button>
-            </div>
+            <button 
+              onClick={onGetStarted}
+              className="w-full sm:w-auto px-14 py-6 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-3xl font-black text-lg hover:shadow-[0_0_50px_rgba(147,51,234,0.3)] transition-all active:scale-95 group flex items-center justify-center gap-3"
+            >
+              Commencer maintenant
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
           </div>
 
-          {/* Right Visual Content (VCard composition) */}
+          {/* Right Visual Content */}
           <div className="relative perspective-[2000px] hidden lg:block animate-in fade-in slide-in-from-right-10 duration-1000 delay-200">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
+            {/* Engagement Metrics */}
             <div className="absolute -top-10 left-0 z-20 bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-3xl shadow-2xl animate-bounce" style={{ animationDuration: '4s' }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center text-green-400">
@@ -119,34 +116,29 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               </div>
             </div>
 
+            {/* Tilted VCard Model */}
             <div 
-              className="relative w-[400px] h-[550px] mx-auto bg-gradient-to-br from-[#1E0B3B] to-[#0A0118] border border-white/10 rounded-[4rem] shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden transform rotate-y-[-25deg] rotate-x-[15deg] rotate-z-[-5deg] hover:rotate-y-[-10deg] transition-transform duration-700"
+              className="relative w-[380px] h-[520px] mx-auto bg-gradient-to-br from-[#1E0B3B] to-[#0A0118] border border-white/10 rounded-[4rem] shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden transform rotate-y-[-25deg] rotate-x-[15deg] rotate-z-[-5deg] hover:rotate-y-[-10deg] transition-transform duration-700"
               style={{ transformStyle: 'preserve-3d' }}
             >
               <div className="absolute top-0 left-0 w-full h-full p-10 flex flex-col items-center">
-                <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full border-4 border-white/10 mb-8 overflow-hidden">
+                <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full border-4 border-white/10 mb-8 overflow-hidden shadow-2xl">
                   <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" alt="Avatar" className="w-full h-full object-cover" />
                 </div>
                 <div className="h-4 w-3/4 bg-white/10 rounded-full mb-3"></div>
                 <div className="h-3 w-1/2 bg-white/5 rounded-full mb-12"></div>
                 
                 <div className="w-full space-y-4">
-                  <div className="h-14 w-full bg-white/5 rounded-2xl border border-white/5 flex items-center px-6">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full mr-4"></div>
-                    <div className="h-3 w-2/3 bg-white/10 rounded-full"></div>
-                  </div>
-                  <div className="h-14 w-full bg-white/5 rounded-2xl border border-white/5 flex items-center px-6">
-                    <div className="w-2 h-2 bg-pink-500 rounded-full mr-4"></div>
-                    <div className="h-3 w-1/2 bg-white/10 rounded-full"></div>
-                  </div>
-                  <div className="h-14 w-full bg-white/5 rounded-2xl border border-white/5 flex items-center px-6">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-4"></div>
-                    <div className="h-3 w-3/4 bg-white/10 rounded-full"></div>
-                  </div>
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-14 w-full bg-white/5 rounded-2xl border border-white/5 flex items-center px-6">
+                      <div className={`w-2 h-2 rounded-full mr-4 ${i === 1 ? 'bg-purple-500' : i === 2 ? 'bg-pink-500' : 'bg-blue-500'}`}></div>
+                      <div className={`h-3 rounded-full bg-white/10 ${i === 1 ? 'w-2/3' : i === 2 ? 'w-1/2' : 'w-3/4'}`}></div>
+                    </div>
+                  ))}
                 </div>
 
-                <div className="mt-auto opacity-20">
-                  <div className="text-[8px] font-black uppercase tracking-[0.5em] text-white">WomenCards Engine</div>
+                <div className="mt-auto opacity-30">
+                  <div className="text-[9px] font-black uppercase tracking-[0.4em] text-white">women.cards/amina</div>
                 </div>
               </div>
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none"></div>
@@ -199,13 +191,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </section>
 
-      {/* Simplified Footer */}
+      {/* Footer */}
       <footer className="py-24 border-t border-white/5 text-center bg-[#0A0118]">
         <div className="flex items-center justify-center gap-3 mb-8">
            <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center text-white text-sm font-black shadow-lg shadow-purple-900/40">W</div>
            <span className="font-black text-xl tracking-tighter">womencards.</span>
         </div>
-        <p className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em]">© 2026 www.women.cards</p>
+        <p className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em]">© 2026 WWW.WOMEN.CARDS</p>
       </footer>
     </div>
   );

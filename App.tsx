@@ -254,14 +254,13 @@ const App: React.FC = () => {
 
         {/* Preview Container */}
         <div className="hidden lg:flex flex-1 bg-[#05010D] items-center justify-center relative overflow-hidden">
-          {/* Ambient Glows */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[160px]"></div>
           
           <div className="relative z-10 flex flex-col items-center gap-10 animate-in zoom-in duration-1000">
              <div className="bg-white/5 backdrop-blur-3xl px-8 py-3.5 rounded-2xl border border-white/10 group cursor-pointer hover:bg-white/10 transition-all active:scale-95 shadow-2xl" onClick={() => window.open(fullProfileUrl, '_blank')}>
                 <p className="text-[11px] font-black text-gray-400 tracking-[0.2em] uppercase flex items-center gap-5">
                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]"></span>
-                  live.digital/{profile.username}
+                  women.cards/{profile.username}
                   <svg className="opacity-40 group-hover:opacity-100 transition-opacity" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
                 </p>
              </div>
