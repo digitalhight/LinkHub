@@ -106,12 +106,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
            <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center text-white text-sm font-black shadow-lg shadow-purple-900/40">W</div>
            <span className="font-black text-xl tracking-tighter">womencards.</span>
         </div>
-        <div className="flex justify-center gap-10 text-[10px] font-black text-gray-500 uppercase tracking-widest mb-10">
-          <a href="#" className="hover:text-white transition-colors">Confidentialité</a>
-          <a href="#" className="hover:text-white transition-colors">Support</a>
-          <a href="#" className="hover:text-white transition-colors">API</a>
-        </div>
-        <p className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em]">© 2024 Global Creators Collective</p>
+        <p className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em]">© 2026 www.women.cards</p>
       </footer>
     </div>
   );
