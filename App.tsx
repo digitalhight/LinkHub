@@ -209,7 +209,6 @@ const App: React.FC = () => {
         <ConfigModal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} />
         <LandingPage 
           onGetStarted={() => setIsAuthModalOpen(true)} 
-          onOpenConfig={() => setIsConfigModalOpen(true)}
         />
         {dbError && !isSupabaseConfigured() && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-red-500/10 border border-red-500/20 backdrop-blur-xl px-6 py-3 rounded-full flex items-center gap-4 z-50">

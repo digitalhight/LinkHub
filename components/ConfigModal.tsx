@@ -21,7 +21,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, onClose }) => 
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-10 animate-in fade-in zoom-in duration-300 overflow-y-auto max-h-[90vh] relative">
+      <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-10 animate-in fade-in zoom-in duration-300 overflow-y-auto max-h-[90vh] relative text-gray-900">
         {onClose && (
           <button onClick={onClose} className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -59,14 +59,25 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, onClose }) => 
             </div>
           </div>
 
-          <div className="bg-amber-50 border border-amber-100 p-6 rounded-3xl">
+          <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl">
              <div className="flex items-start gap-3">
-               <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-white flex-shrink-0 mt-0.5 font-bold text-xs">!</div>
-               <div>
-                  <p className="text-xs font-black text-amber-900 uppercase tracking-tight mb-2">Pourquoi cette étape ?</p>
-                  <p className="text-[11px] text-amber-800 leading-relaxed italic">
-                    Si vous voyez "No available server", cela signifie que le serveur de base de données partagé est saturé ou en pause. Utiliser vos propres clés résoudra ce problème définitivement.
+               <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white flex-shrink-0 mt-0.5 font-bold text-xs">i</div>
+               <div className="w-full">
+                  <p className="text-xs font-black text-blue-900 uppercase tracking-tight mb-2">Aide Déploiement Nginx</p>
+                  <p className="text-[10px] text-blue-800 leading-relaxed mb-4">
+                    Pour <strong>women.cards</strong>, votre config Nginx doit ressembler à ceci (incluant le bloc <code>server</code>) :
                   </p>
+                  <pre className="bg-gray-900 text-blue-300 p-4 rounded-xl text-[9px] font-mono overflow-x-auto shadow-inner leading-normal">
+{`server {
+  listen 80;
+  server_name women.cards;
+  root /votre/chemin;
+  
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}`}
+                  </pre>
                </div>
              </div>
           </div>
