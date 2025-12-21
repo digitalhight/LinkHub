@@ -40,7 +40,7 @@ const App: React.FC = () => {
 
       if (firstSegment) {
         const segment = firstSegment.toLowerCase();
-        const isReserved = ['index.html', 'auth', 'login', 'api', 'admin', 'assets', 'static'].includes(segment);
+        const isReserved = ['index.html', 'auth', 'login', 'api', 'admin', 'assets', 'static', 'dashboard'].includes(segment);
         if (!isReserved && !segment.includes('.') && segment.length >= 3) {
           setIsPublicView(true);
           setIsAdminView(false);
@@ -210,7 +210,19 @@ const App: React.FC = () => {
       <header className="h-16 lg:h-20 border-b border-white/5 bg-[#0A0118]/80 backdrop-blur-3xl flex items-center px-4 lg:px-8 justify-between flex-shrink-0 z-20">
         <div className="flex items-center gap-2 lg:gap-3">
           <div className="w-8 h-8 lg:w-9 lg:h-9 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg font-['Bricolage_Grotesque']">W</div>
-          <h1 className="font-black text-sm lg:text-lg tracking-tighter hidden xs:block">WomenCards<span className="text-purple-500">.</span></h1>
+          <div className="flex flex-col xs:flex-row items-baseline gap-1 xs:gap-2">
+            <h1 className="font-black text-sm lg:text-lg tracking-tighter hidden xs:block">WomenCards<span className="text-purple-500">.</span></h1>
+            
+            {/* Lien du profil direct dans le header */}
+            <a 
+              href={`/${profile.username}`} 
+              target="_blank" 
+              className="hidden md:flex items-center gap-2 ml-4 px-3 py-1 bg-white/5 border border-white/5 rounded-full hover:bg-white/10 transition-all group"
+            >
+              <div className="w-1 h-1 rounded-full bg-purple-500 group-hover:animate-pulse"></div>
+              <span className="text-[9px] font-black text-gray-500 group-hover:text-purple-400 uppercase tracking-widest transition-colors">women.cards/{profile.username}</span>
+            </a>
+          </div>
         </div>
         
         <div className="flex gap-2 lg:gap-6 items-center">
