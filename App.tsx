@@ -177,6 +177,9 @@ const App: React.FC = () => {
     );
   }
 
+  // URL de profil dynamique
+  const fullProfileUrl = `${window.location.origin}/${profile.username}`;
+
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-gray-50 font-['Plus_Jakarta_Sans']">
       <ConfigModal isOpen={isConfigModalOpen} />
@@ -233,10 +236,12 @@ const App: React.FC = () => {
           <div className="absolute inset-0 bg-[radial-gradient(#3d5afe_1px,transparent_1px)] [background-size:40px_40px] opacity-[0.04]"></div>
           
           <div className="relative z-10 flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-500">
-            <div className="bg-white/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/80 shadow-sm mb-2">
-              <p className="text-[10px] font-black text-[#3D5AFE] uppercase tracking-widest flex items-center gap-2">
+            <div className="bg-white/80 backdrop-blur-md px-5 py-2.5 rounded-full border border-white shadow-sm mb-2 group cursor-pointer hover:bg-white transition-all active:scale-95" onClick={() => window.open(fullProfileUrl, '_blank')}>
+              <p className="text-[11px] font-black text-[#3D5AFE] tracking-tight flex items-center gap-3">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                Aperçu en direct
+                <span className="opacity-40 font-bold uppercase tracking-widest text-[9px] mr-[-4px]">Mon Lien :</span>
+                <span className="underline decoration-blue-200 underline-offset-4">{fullProfileUrl.replace('https://', '').replace('http://', '')}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-30 group-hover:opacity-100 transition-opacity"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
               </p>
             </div>
             <div className="scale-90 xl:scale-100 drop-shadow-[0_40px_80px_rgba(0,0,0,0.1)]">
