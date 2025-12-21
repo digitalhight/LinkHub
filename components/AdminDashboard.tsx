@@ -62,7 +62,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
   );
 
   return (
-    <div className="min-h-screen bg-[#0A0118] font-['Plus_Jakarta_Sans'] text-white overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-[#0A0118] font(['Plus_Jakarta_Sans']) text-white overflow-hidden flex flex-col">
       {/* Header */}
       <header className="h-20 border-b border-white/5 bg-[#0A0118]/80 backdrop-blur-3xl flex items-center justify-between px-8 sticky top-0 z-[60]">
         <div className="flex items-center gap-3">
@@ -83,10 +83,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
 
       <main className="flex-1 overflow-hidden flex p-8 gap-8">
         
-        {/* SECTION GAUCHE : CHIFFRES CLÉS */}
+        {/* SECTION GAUCHE : CHIFFRES CLÉS (Titre 'Performances' supprimé pour équilibrage) */}
         <aside className="w-[350px] space-y-6 overflow-y-auto pr-4 scrollbar-hide">
-          <h2 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-4 ml-2">Performances</h2>
-          
           <div className="bg-white/5 border border-white/5 p-8 rounded-[2.5rem] relative overflow-hidden group">
             <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all"></div>
             <p className="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-4">Total Profils</p>
@@ -128,7 +126,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
         <section className="flex-1 bg-white/5 border border-white/5 rounded-[3rem] overflow-hidden flex flex-col shadow-2xl backdrop-blur-xl">
           <div className="p-8 border-b border-white/5 flex items-center justify-between gap-6 bg-white/[0.02]">
             <div>
-              <h2 className="text-xl font-black tracking-tight">Base de données</h2>
+              <h2 className="text-xl font-black tracking-tight text-white uppercase tracking-tighter">Base de données</h2>
               <p className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-widest">Supervision des comptes actifs</p>
             </div>
             
