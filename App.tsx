@@ -27,22 +27,18 @@ const App: React.FC = () => {
   useEffect(() => {
     const checkRouting = () => {
       const pathSegments = window.location.pathname.split('/').filter(Boolean);
-      let candidate = pathSegments.length > 0 ? pathSegments[0] : null;
+      let firstSegment = pathSegments.length > 0 ? pathSegments[0] : null;
       
-      if (candidate === 'admin') {
+      // Gestion spécifique de la route Admin
+      if (firstSegment === 'admin') {
         setIsAdminView(true);
         setIsPublicView(false);
         return;
       }
 
-      const hash = window.location.hash.replace('#/', '').replace('#', '').trim();
-      if (!candidate && hash) {
-        candidate = hash;
-        try { window.history.replaceState(null, '', `/${hash}`); } catch (e) {}
-      }
-
-      if (candidate) {
-        const segment = candidate.toLowerCase();
+      // Gestion fallback pour les liens profils (ex: /sophie)
+      if (firstSegment) {
+        const segment = firstSegment.toLowerCase();
         const isReserved = ['index.html', 'auth', 'login', 'api', 'admin', 'assets', 'static'].includes(segment);
         if (!isReserved && !segment.includes('.') && segment.length >= 3) {
           setIsPublicView(true);
@@ -51,6 +47,7 @@ const App: React.FC = () => {
           return;
         }
       }
+
       setIsAdminView(false);
       setIsPublicView(false);
     };
@@ -74,7 +71,7 @@ const App: React.FC = () => {
           await fetchProfile(session.user.id);
         }
       } catch (err) {
-        console.warn("Session check failed");
+        console.warn("Session error");
       } finally {
         setLoading(false);
       }
@@ -156,7 +153,7 @@ const App: React.FC = () => {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err: any) {
-      alert(err.message || "Erreur de sauvegarde");
+      alert(err.message || "Erreur sauvegarde");
     } finally {
       setSaving(false);
     }
@@ -164,10 +161,10 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white z-[9999]">
+      <div className="fixed inset-0 flex items-center justify-center bg-[#FDFDFF] z-[9999]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 bg-[#3D5AFE] rounded-xl flex items-center justify-center text-white font-black text-2xl animate-bounce">W</div>
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Initialisation...</p>
+          <div className="w-14 h-14 bg-[#3D5AFE] rounded-[1.5rem] flex items-center justify-center text-white font-black text-2xl animate-pulse shadow-2xl shadow-blue-100">W</div>
+          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em] animate-bounce">WomenCards</p>
         </div>
       </div>
     );
@@ -178,7 +175,8 @@ const App: React.FC = () => {
   }
 
   if (isAdminView) {
-    if (!profile.is_admin && profile.email !== 'digitalhight2025@gmail.com') {
+    const isAdmin = profile.is_admin || profile.email === 'digitalhight2025@gmail.com';
+    if (!isAdmin) {
       window.location.href = '/';
       return null;
     }
@@ -201,46 +199,48 @@ const App: React.FC = () => {
       <ConfigModal isOpen={isConfigModalOpen} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={(id) => { setUserId(id); fetchProfile(id); }} />
       
-      {/* Header */}
-      <header className="h-16 border-b border-gray-100 bg-white flex items-center px-6 justify-between flex-shrink-0 z-20">
+      {/* Top Navigation */}
+      <header className="h-16 border-b border-gray-100 bg-white flex items-center px-6 justify-between flex-shrink-0 z-20 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#3D5AFE] rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg shadow-blue-100">W</div>
+          <div className="w-8 h-8 bg-[#3D5AFE] rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg">W</div>
           <h1 className="font-black text-lg tracking-tighter">WomenCards<span className="text-[#3D5AFE]">.</span></h1>
         </div>
         
         <div className="flex gap-4 items-center">
-          {profile.is_admin && (
+          {(profile.is_admin || profile.email === 'digitalhight2025@gmail.com') && (
             <button 
               onClick={() => window.location.href = '/admin'} 
-              className="text-[10px] font-black text-amber-600 hover:text-amber-700 uppercase tracking-widest px-4 py-2 bg-amber-50 rounded-lg transition-colors border border-amber-100"
+              className="text-[10px] font-black text-amber-600 hover:text-amber-700 uppercase tracking-widest px-4 py-2 bg-amber-50 rounded-lg transition-colors border border-amber-100 flex items-center gap-2"
             >
-              Mode Admin
+              <div className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></div>
+              Tableau de Bord Admin
             </button>
           )}
+          <div className="h-6 w-px bg-gray-100 mx-2"></div>
           <button onClick={() => { supabase.auth.signOut(); setUserId(''); setProfile(INITIAL_PROFILE); window.location.href = '/'; }} className="text-[10px] font-black text-gray-400 hover:text-red-500 uppercase tracking-widest transition-colors">Déconnexion</button>
           <button 
             onClick={handleSave} 
             disabled={saving} 
             className={`text-[11px] font-black px-8 py-2.5 rounded-full transition-all shadow-xl ${saveSuccess ? 'bg-green-500 text-white shadow-green-100' : 'bg-[#3D5AFE] text-white shadow-blue-100 active:scale-95 disabled:opacity-50'}`}
           >
-            {saving ? 'SAUVEGARDE...' : saveSuccess ? 'SAUVEGARDÉ !' : 'ENREGISTRER'}
+            {saving ? 'PROCESS...' : saveSuccess ? 'SAUVEGARDÉ !' : 'ENREGISTRER'}
           </button>
           <button className="p-2 text-gray-300 hover:text-[#3D5AFE] transition-colors" onClick={() => setIsConfigModalOpen(true)}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </button>
         </div>
       </header>
 
-      {/* Main Content Area */}
+      {/* Main Layout */}
       <main className="flex-1 flex overflow-hidden">
         
-        {/* Column 1: Content (Left) */}
-        <div className="w-full lg:w-[400px] xl:w-[450px] bg-white border-r border-gray-100 flex flex-col flex-shrink-0 overflow-y-auto no-scrollbar">
+        {/* Left column - Content Settings */}
+        <div className="w-full lg:w-[420px] bg-white border-r border-gray-100 flex flex-col flex-shrink-0 overflow-y-auto no-scrollbar">
           <div className="p-8 space-y-12">
             <div>
               <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-[#3D5AFE] rounded-full"></span>
-                Contenu du Profil
+                Profil de la créatrice
               </h2>
               <ProfileSection profile={profile} setProfile={setProfile} />
             </div>
@@ -248,14 +248,14 @@ const App: React.FC = () => {
             <div className="pt-8 border-t border-gray-50">
               <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-orange-400 rounded-full"></span>
-                Liens & Réseaux
+                Catalogue de liens
               </h2>
               <LinksSection profile={profile} setProfile={setProfile} />
             </div>
           </div>
         </div>
 
-        {/* Column 2: Live Preview (Center) */}
+        {/* Center - Real-time Preview */}
         <div className="hidden lg:flex flex-1 bg-[#FDFDFF] items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(#3d5afe_1px,transparent_1px)] [background-size:40px_40px] opacity-[0.04]"></div>
           
@@ -263,7 +263,7 @@ const App: React.FC = () => {
             <div className="bg-white/80 backdrop-blur-md px-5 py-2.5 rounded-full border border-white shadow-sm mb-2 group cursor-pointer hover:bg-white transition-all active:scale-95" onClick={() => window.open(fullProfileUrl, '_blank')}>
               <p className="text-[11px] font-black text-[#3D5AFE] tracking-tight flex items-center gap-3">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                <span className="opacity-40 font-bold uppercase tracking-widest text-[9px] mr-[-4px]">Mon Lien :</span>
+                <span className="opacity-40 font-bold uppercase tracking-widest text-[9px] mr-[-4px]">Ma Page :</span>
                 <span className="underline decoration-blue-200 underline-offset-4">{fullProfileUrl.replace('https://', '').replace('http://', '')}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-30 group-hover:opacity-100 transition-opacity"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
               </p>
@@ -274,13 +274,13 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Column 3: Appearance (Right) */}
+        {/* Right column - Visual Settings */}
         <div className="hidden xl:flex w-[380px] bg-white border-l border-gray-100 flex-col flex-shrink-0 overflow-y-auto no-scrollbar">
           <div className="p-8 space-y-12">
             <div>
               <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
-                Apparence & Thèmes
+                Thèmes & Couleurs
               </h2>
               <ThemeSection profile={profile} setProfile={setProfile} />
             </div>
