@@ -8,29 +8,41 @@ const Icons = {
   Plus: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>,
   Check: () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
   Image: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>,
-  Loader: () => <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+  Loader: () => <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>,
+  Info: () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
 };
 
 export const ProfileSection: React.FC<{ profile: UserProfile, setProfile: (p: UserProfile) => void }> = ({ profile, setProfile }) => {
   const [uploading, setUploading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
+      setErrorMsg(null);
       setUploading(true);
       if (!event.target.files || event.target.files.length === 0) return;
 
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Vous devez être connecté pour uploader une image.");
+
       const file = event.target.files[0];
       const fileExt = file.name.split('.').pop();
-      // Utilisation d'un timestamp pour garantir l'unicité et forcer le rafraîchissement du cache navigateur
-      const fileName = `${profile.id || 'anon'}-${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      const fileName = `avatar-${Date.now()}.${fileExt}`;
+      
+      // CRUCIAL : Le chemin doit commencer par l'ID de l'utilisateur pour respecter la Policy "UID folder"
+      const filePath = `${session.user.id}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        if (uploadError.message.includes('RLS policy')) {
+          throw new Error("Sécurité Supabase : Vérifiez que la Policy INSERT est bien activée sur le bucket 'avatars'.");
+        }
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
@@ -38,7 +50,8 @@ export const ProfileSection: React.FC<{ profile: UserProfile, setProfile: (p: Us
 
       setProfile({ ...profile, avatarUrl: publicUrl });
     } catch (error: any) {
-      alert("Erreur lors du transfert : " + error.message + "\n\nVérifiez que le bucket 'avatars' est bien créé dans Supabase.");
+      setErrorMsg(error.message);
+      console.error("Upload Error:", error);
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -48,11 +61,10 @@ export const ProfileSection: React.FC<{ profile: UserProfile, setProfile: (p: Us
   return (
     <div className="space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col gap-6">
-        {/* Zone Upload Avatar */}
         <div className="flex flex-col items-center lg:items-start gap-4">
           <div 
             onClick={() => !uploading && fileInputRef.current?.click()}
-            className={`relative w-28 h-28 lg:w-32 lg:h-32 rounded-[2.5rem] overflow-hidden border-2 transition-all shadow-2xl cursor-pointer group flex items-center justify-center bg-[#120526] ${uploading ? 'border-purple-500 opacity-70' : 'border-white/10 hover:border-purple-500/50'}`}
+            className={`relative w-28 h-28 lg:w-32 lg:h-32 rounded-[2.5rem] overflow-hidden border-2 transition-all shadow-2xl cursor-pointer group flex items-center justify-center bg-[#120526] ${uploading ? 'border-purple-500 opacity-70' : errorMsg ? 'border-red-500/50' : 'border-white/10 hover:border-purple-500/50'}`}
           >
              <img 
                src={profile.avatarUrl || `https://ui-avatars.com/api/?name=${profile.name}&background=6366f1&color=fff`} 
@@ -78,9 +90,24 @@ export const ProfileSection: React.FC<{ profile: UserProfile, setProfile: (p: Us
           </div>
           <div className="text-center lg:text-left">
             <h3 className="text-xs font-black uppercase tracking-widest text-white mb-1">Photo de Profil</h3>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Format JPG/PNG recommandé</p>
+            <p className={`text-[10px] font-bold uppercase tracking-tight ${errorMsg ? 'text-red-400 animate-pulse' : 'text-gray-500'}`}>
+              {errorMsg ? "Erreur de configuration" : "Format JPG/PNG recommandé"}
+            </p>
           </div>
         </div>
+
+        {errorMsg && (
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl animate-in slide-in-from-top-2">
+            <div className="flex items-start gap-3">
+              <div className="text-red-500 mt-0.5"><Icons.Info /></div>
+              <p className="text-[10px] font-bold text-red-200 leading-relaxed uppercase tracking-tight">
+                {errorMsg}
+                <br /><br />
+                <span className="text-white">Action : Allez dans Supabase > Storage > avatars > Policies et assurez-vous d'avoir autorisé l'INSERT (Upload).</span>
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-6">
           <div className="space-y-2">

@@ -29,14 +29,14 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, onClose }) => 
         )}
 
         <div className="mb-8">
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">Configuration Base de Données</h2>
-          <p className="text-sm text-gray-500 font-medium">Connectez votre propre compte Supabase pour garantir la disponibilité de vos données.</p>
+          <h2 className="text-2xl font-black text-gray-900 tracking-tight leading-tight">Configuration Supabase</h2>
+          <p className="text-sm text-gray-500 font-medium">Paramétrez votre base de données et votre stockage de photos.</p>
         </div>
 
         <form onSubmit={handleSave} className="space-y-6">
           <div className="space-y-4">
             <div>
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">URL de votre Projet (API URL)</label>
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">URL du Projet</label>
               <input 
                 type="url" 
                 placeholder="https://votre-projet.supabase.co"
@@ -47,7 +47,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, onClose }) => 
               />
             </div>
             <div>
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Clé API Anon (Public Key)</label>
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Clé API Anon</label>
               <input 
                 type="password" 
                 placeholder="eyJhbGciOiJIUzI1..."
@@ -59,25 +59,19 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, onClose }) => 
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-100 p-6 rounded-3xl">
+          <div className="bg-purple-50 border border-purple-100 p-6 rounded-3xl space-y-4">
              <div className="flex items-start gap-3">
-               <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white flex-shrink-0 mt-0.5 font-bold text-xs">i</div>
+               <div className="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white flex-shrink-0 mt-0.5 font-bold text-xs">!</div>
                <div className="w-full">
-                  <p className="text-xs font-black text-blue-900 uppercase tracking-tight mb-2">Aide Déploiement Nginx</p>
-                  <p className="text-[10px] text-blue-800 leading-relaxed mb-4">
-                    Pour <strong>women.cards</strong>, votre config Nginx doit ressembler à ceci (incluant le bloc <code>server</code>) :
+                  <p className="text-xs font-black text-purple-900 uppercase tracking-tight mb-2">Configuration du Stockage</p>
+                  <p className="text-[10px] text-purple-800 leading-relaxed">
+                    Pour l'upload de photos, créez un bucket <strong>'avatars'</strong> dans Supabase Storage :
                   </p>
-                  <pre className="bg-gray-900 text-blue-300 p-4 rounded-xl text-[9px] font-mono overflow-x-auto shadow-inner leading-normal">
-{`server {
-  listen 80;
-  server_name women.cards;
-  root /votre/chemin;
-  
-  location / {
-    try_files $uri $uri/ /index.html;
-  }
-}`}
-                  </pre>
+                  <ul className="mt-3 space-y-2 text-[10px] text-purple-700 font-bold list-disc pl-4">
+                    <li>Rendre le bucket <strong>Public</strong>.</li>
+                    <li>Ajouter une Policy <strong>INSERT</strong> pour autoriser l'upload.</li>
+                    <li>Ajouter une Policy <strong>SELECT</strong> pour la lecture.</li>
+                  </ul>
                </div>
              </div>
           </div>
@@ -86,7 +80,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, onClose }) => 
             type="submit" 
             className="w-full py-5 bg-[#3D5AFE] hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-100 transition-all active:scale-95"
           >
-            Enregistrer & Redémarrer
+            Enregistrer & Actualiser
           </button>
         </form>
       </div>
