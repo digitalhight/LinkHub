@@ -16,6 +16,7 @@ const App: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [userId, setUserId] = useState<string>('');
+  const [userAuthEmail, setUserAuthEmail] = useState<string>('');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   
@@ -29,14 +30,12 @@ const App: React.FC = () => {
       const pathSegments = window.location.pathname.split('/').filter(Boolean);
       let firstSegment = pathSegments.length > 0 ? pathSegments[0] : null;
       
-      // Gestion spécifique de la route Admin
       if (firstSegment === 'admin') {
         setIsAdminView(true);
         setIsPublicView(false);
         return;
       }
 
-      // Gestion fallback pour les liens profils (ex: /sophie)
       if (firstSegment) {
         const segment = firstSegment.toLowerCase();
         const isReserved = ['index.html', 'auth', 'login', 'api', 'admin', 'assets', 'static'].includes(segment);
@@ -64,14 +63,16 @@ const App: React.FC = () => {
     }
 
     const checkSession = async () => {
+      setLoading(true);
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           setUserId(session.user.id);
+          setUserAuthEmail(session.user.email || '');
           await fetchProfile(session.user.id);
         }
       } catch (err) {
-        console.warn("Session error");
+        console.warn("Session check error");
       } finally {
         setLoading(false);
       }
@@ -143,7 +144,7 @@ const App: React.FC = () => {
         bio: profile.bio,
         avatar_url: profile.avatarUrl,
         phone: profile.phone,
-        email: profile.email,
+        email: profile.email || userAuthEmail, // Backup with auth email
         links: profile.links,
         theme: profile.theme,
         updated_at: new Date().toISOString(),
@@ -164,7 +165,7 @@ const App: React.FC = () => {
       <div className="fixed inset-0 flex items-center justify-center bg-[#FDFDFF] z-[9999]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-14 h-14 bg-[#3D5AFE] rounded-[1.5rem] flex items-center justify-center text-white font-black text-2xl animate-pulse shadow-2xl shadow-blue-100">W</div>
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em] animate-bounce">WomenCards</p>
+          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em] animate-bounce">Chargement...</p>
         </div>
       </div>
     );
@@ -174,12 +175,30 @@ const App: React.FC = () => {
     return <PublicProfile profile={profile} notFound={notFound} />;
   }
 
+  // Vérification de l'accès Admin
   if (isAdminView) {
-    const isAdmin = profile.is_admin || profile.email === 'digitalhight2025@gmail.com';
-    if (!isAdmin) {
+    const isAdmin = profile.is_admin || userAuthEmail === 'digitalhight2025@gmail.com';
+    
+    // Si pas encore connecté, on redirige vers l'accueil pour login
+    if (!userId) {
       window.location.href = '/';
       return null;
     }
+    
+    // Si connecté mais pas admin
+    if (!isAdmin) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-10 text-center">
+          <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h2 className="text-2xl font-black text-gray-900 mb-2">Accès Refusé</h2>
+          <p className="text-gray-500 max-w-xs mb-8 font-medium">Vous n'avez pas les permissions nécessaires pour accéder à cet espace.</p>
+          <button onClick={() => window.location.href = '/'} className="px-8 py-3 bg-gray-900 text-white rounded-full font-black text-xs uppercase tracking-widest shadow-xl">Retour à l'accueil</button>
+        </div>
+      );
+    }
+    
     return <AdminDashboard currentUser={profile} />;
   }
 
@@ -199,7 +218,6 @@ const App: React.FC = () => {
       <ConfigModal isOpen={isConfigModalOpen} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={(id) => { setUserId(id); fetchProfile(id); }} />
       
-      {/* Top Navigation */}
       <header className="h-16 border-b border-gray-100 bg-white flex items-center px-6 justify-between flex-shrink-0 z-20 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-[#3D5AFE] rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg">W</div>
@@ -207,7 +225,7 @@ const App: React.FC = () => {
         </div>
         
         <div className="flex gap-4 items-center">
-          {(profile.is_admin || profile.email === 'digitalhight2025@gmail.com') && (
+          {(profile.is_admin || userAuthEmail === 'digitalhight2025@gmail.com') && (
             <button 
               onClick={() => window.location.href = '/admin'} 
               className="text-[10px] font-black text-amber-600 hover:text-amber-700 uppercase tracking-widest px-4 py-2 bg-amber-50 rounded-lg transition-colors border border-amber-100 flex items-center gap-2"
@@ -217,7 +235,7 @@ const App: React.FC = () => {
             </button>
           )}
           <div className="h-6 w-px bg-gray-100 mx-2"></div>
-          <button onClick={() => { supabase.auth.signOut(); setUserId(''); setProfile(INITIAL_PROFILE); window.location.href = '/'; }} className="text-[10px] font-black text-gray-400 hover:text-red-500 uppercase tracking-widest transition-colors">Déconnexion</button>
+          <button onClick={() => { supabase.auth.signOut().then(() => { setUserId(''); window.location.href = '/'; }); }} className="text-[10px] font-black text-gray-400 hover:text-red-500 uppercase tracking-widest transition-colors">Déconnexion</button>
           <button 
             onClick={handleSave} 
             disabled={saving} 
@@ -231,10 +249,7 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Layout */}
       <main className="flex-1 flex overflow-hidden">
-        
-        {/* Left column - Content Settings */}
         <div className="w-full lg:w-[420px] bg-white border-r border-gray-100 flex flex-col flex-shrink-0 overflow-y-auto no-scrollbar">
           <div className="p-8 space-y-12">
             <div>
@@ -244,7 +259,6 @@ const App: React.FC = () => {
               </h2>
               <ProfileSection profile={profile} setProfile={setProfile} />
             </div>
-            
             <div className="pt-8 border-t border-gray-50">
               <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-orange-400 rounded-full"></span>
@@ -255,10 +269,8 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Center - Real-time Preview */}
         <div className="hidden lg:flex flex-1 bg-[#FDFDFF] items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(#3d5afe_1px,transparent_1px)] [background-size:40px_40px] opacity-[0.04]"></div>
-          
           <div className="relative z-10 flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-500">
             <div className="bg-white/80 backdrop-blur-md px-5 py-2.5 rounded-full border border-white shadow-sm mb-2 group cursor-pointer hover:bg-white transition-all active:scale-95" onClick={() => window.open(fullProfileUrl, '_blank')}>
               <p className="text-[11px] font-black text-[#3D5AFE] tracking-tight flex items-center gap-3">
@@ -274,7 +286,6 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Right column - Visual Settings */}
         <div className="hidden xl:flex w-[380px] bg-white border-l border-gray-100 flex-col flex-shrink-0 overflow-y-auto no-scrollbar">
           <div className="p-8 space-y-12">
             <div>
@@ -286,7 +297,6 @@ const App: React.FC = () => {
             </div>
           </div>
         </div>
-
       </main>
     </div>
   );
