@@ -7,6 +7,7 @@ import PublicProfile from './components/PublicProfile';
 import LandingPage from './components/LandingPage';
 import AdminDashboard from './components/AdminDashboard';
 import { AuthModal } from './components/AuthModal';
+import { ConfigModal } from './components/ConfigModal';
 import { supabase, isSupabaseConfigured } from './utils/supabaseClient';
 
 const App: React.FC = () => {
@@ -17,12 +18,14 @@ const App: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
   const [userAuthEmail, setUserAuthEmail] = useState<string>('');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [activeEditorTab, setActiveEditorTab] = useState<'profile' | 'links'>('profile');
   
   const [isPublicView, setIsPublicView] = useState(false);
   const [isAdminView, setIsAdminView] = useState(false);
   const [publicUsername, setPublicUsername] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [dbError, setDbError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkRouting = () => {
@@ -56,31 +59,38 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (isPublicView && publicUsername) {
-      fetchPublicProfile(publicUsername);
-      return;
-    }
+    const initApp = async () => {
+      if (isPublicView && publicUsername) {
+        await fetchPublicProfile(publicUsername);
+        return;
+      }
 
-    const checkSession = async () => {
       setLoading(true);
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        // Timeout de 5s pour éviter l'écran de chargement infini si Supabase est down
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Supabase")), 5000));
+        
+        const result: any = await Promise.race([sessionPromise, timeoutPromise]);
+        const session = result?.data?.session;
+
         if (session) {
           setUserId(session.user.id);
           setUserAuthEmail(session.user.email || '');
           await fetchProfile(session.user.id);
         }
-      } catch (err) {
-        console.warn("Session check error");
+      } catch (err: any) {
+        console.warn("Erreur d'initialisation (Base de données possiblement hors-ligne):", err.message);
+        setDbError("La base de données semble indisponible.");
       } finally {
         setLoading(false);
       }
     };
-    checkSession();
+
+    initApp();
   }, [isPublicView, publicUsername]);
 
   const fetchPublicProfile = async (username: string) => {
-    if (!isSupabaseConfigured()) { setLoading(false); return; }
     setLoading(true);
     setNotFound(false);
     try {
@@ -153,7 +163,7 @@ const App: React.FC = () => {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err: any) {
-      alert(err.message || "Erreur sauvegarde");
+      alert("Erreur de sauvegarde: " + (err.message || "Serveur indisponible"));
     } finally {
       setSaving(false);
     }
@@ -161,11 +171,15 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#0A0118] z-[9999]">
-        <div className="flex flex-col items-center gap-6 text-white">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white font-black text-3xl animate-pulse shadow-[0_0_40px_rgba(168,85,247,0.4)]">W</div>
-          <p className="text-[10px] font-black uppercase tracking-[0.6em] animate-pulse">Initialisation Système...</p>
-        </div>
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#0A0118] z-[9999]">
+        <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white font-black text-3xl animate-pulse shadow-[0_0_40px_rgba(168,85,247,0.4)]">W</div>
+        <p className="mt-8 text-[10px] font-black uppercase tracking-[0.6em] animate-pulse">Initialisation...</p>
+        <button 
+          onClick={() => setIsConfigModalOpen(true)}
+          className="mt-12 text-[9px] font-black text-white/20 hover:text-white uppercase tracking-widest transition-colors underline underline-offset-4"
+        >
+          Accéder à la configuration (Debug)
+        </button>
       </div>
     );
   }
@@ -192,7 +206,17 @@ const App: React.FC = () => {
     return (
       <>
         <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={(id) => { setUserId(id); fetchProfile(id); }} />
-        <LandingPage onGetStarted={() => setIsAuthModalOpen(true)} />
+        <ConfigModal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} />
+        <LandingPage 
+          onGetStarted={() => setIsAuthModalOpen(true)} 
+          onOpenConfig={() => setIsConfigModalOpen(true)}
+        />
+        {dbError && !isSupabaseConfigured() && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-red-500/10 border border-red-500/20 backdrop-blur-xl px-6 py-3 rounded-full flex items-center gap-4 z-50">
+             <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">Base de données non configurée ou inactive</span>
+             <button onClick={() => setIsConfigModalOpen(true)} className="bg-white text-red-500 text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">Réparer</button>
+          </div>
+        )}
       </>
     );
   }
@@ -203,6 +227,7 @@ const App: React.FC = () => {
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#0A0118] font-['Plus_Jakarta_Sans'] text-white">
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={(id) => { setUserId(id); fetchProfile(id); }} />
+      <ConfigModal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} />
       
       <header className="h-16 border-b border-white/5 bg-[#0A0118]/80 backdrop-blur-3xl flex items-center px-8 justify-between flex-shrink-0 z-20">
         <div className="flex items-center gap-3">
@@ -211,6 +236,9 @@ const App: React.FC = () => {
         </div>
         
         <div className="flex gap-6 items-center">
+          <button onClick={() => setIsConfigModalOpen(true)} className="w-8 h-8 flex items-center justify-center text-white/20 hover:text-white transition-colors" title="Configuration">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
           <button onClick={() => { supabase.auth.signOut().then(() => { setUserId(''); window.location.href = '/'; }); }} className="text-[10px] font-black text-gray-500 hover:text-white uppercase tracking-widest transition-colors">Déconnexion</button>
           <button 
             onClick={handleSave} 

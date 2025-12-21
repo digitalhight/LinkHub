@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 interface LandingPageProps {
   onGetStarted: () => void;
+  onOpenConfig?: () => void;
 }
 
 const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => {
@@ -29,7 +30,7 @@ const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, ans
   );
 };
 
-const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onOpenConfig }) => {
   const faqs = [
     {
       question: "Qu’est-ce qu’une vCard et pourquoi est-elle essentielle aujourd’hui ?",
@@ -65,12 +66,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-transform hover:rotate-12 cursor-pointer">W</div>
             <span className="font-black text-2xl tracking-tighter">WomenCards<span className="text-purple-500">.</span></span>
           </div>
-          <button 
-            onClick={onGetStarted}
-            className="bg-white text-[#0A0118] px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95 border border-white"
-          >
-            Démarrer
-          </button>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={onOpenConfig}
+              className="text-white/20 hover:text-white transition-colors"
+              title="Paramètres de connexion"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+            <button 
+              onClick={onGetStarted}
+              className="bg-white text-[#0A0118] px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95 border border-white"
+            >
+              Démarrer
+            </button>
+          </div>
         </div>
       </nav>
 

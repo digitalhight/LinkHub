@@ -25,7 +25,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
 
     try {
       if (mode === 'signup') {
-        // Sign Up Flow
         const { data, error } = await supabase.auth.signUp({
           email: cleanEmail,
           password: cleanPassword,
@@ -33,14 +32,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         if (error) throw error;
         
         if (data.session) {
-          onSuccess(data.session.user.id, true); // true = isNewUser
+          onSuccess(data.session.user.id, true);
           onClose();
         } else if (data.user && !data.session) {
-          // Sometimes email confirmation is required, though usually disabled for simple apps
           setError("Account created! Please check your email to confirm.");
         }
       } else {
-        // Sign In Flow
         const { data, error } = await supabase.auth.signInWithPassword({
           email: cleanEmail,
           password: cleanPassword,
@@ -48,7 +45,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         if (error) throw error;
 
         if (data.session) {
-          onSuccess(data.session.user.id, false); // false = isNewUser
+          onSuccess(data.session.user.id, false);
           onClose();
         }
       }
@@ -69,7 +66,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
         
-        {/* Tabs */}
         <div className="flex gap-4 mb-6 border-b border-gray-200">
           <button
             onClick={() => { setMode('signin'); setError(null); }}
@@ -105,7 +101,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
               type="email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900"
               placeholder="you@example.com"
               required
             />
@@ -116,7 +112,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900"
               placeholder="••••••••"
               required
               minLength={6}

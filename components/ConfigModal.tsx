@@ -3,9 +3,10 @@ import { saveSupabaseConfig } from '../utils/supabaseClient';
 
 interface ConfigModalProps {
   isOpen: boolean;
+  onClose?: () => void;
 }
 
-export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen }) => {
+export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, onClose }) => {
   const [url, setUrl] = useState('');
   const [key, setKey] = useState('');
 
@@ -19,66 +20,62 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-10 animate-in fade-in zoom-in duration-300 overflow-y-auto max-h-[90vh]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-10 animate-in fade-in zoom-in duration-300 overflow-y-auto max-h-[90vh] relative">
+        {onClose && (
+          <button onClick={onClose} className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        )}
+
         <div className="mb-8">
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">Configuration</h2>
-          <p className="text-sm text-gray-500 font-medium">Connectez votre propre base de données Supabase.</p>
+          <h2 className="text-2xl font-black text-gray-900 tracking-tight">Configuration Base de Données</h2>
+          <p className="text-sm text-gray-500 font-medium">Connectez votre propre compte Supabase pour garantir la disponibilité de vos données.</p>
         </div>
 
         <form onSubmit={handleSave} className="space-y-6">
           <div className="space-y-4">
             <div>
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">URL de votre Projet</label>
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">URL de votre Projet (API URL)</label>
               <input 
                 type="url" 
-                placeholder="https://xyz.supabase.co"
+                placeholder="https://votre-projet.supabase.co"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="w-full px-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-[#3D5AFE] transition-all"
+                className="w-full px-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-[#3D5AFE] transition-all text-gray-900"
                 required
               />
             </div>
             <div>
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Clé API Anon</label>
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Clé API Anon (Public Key)</label>
               <input 
                 type="password" 
                 placeholder="eyJhbGciOiJIUzI1..."
                 value={key}
                 onChange={(e) => setKey(e.target.value)}
-                className="w-full px-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-[#3D5AFE] transition-all"
+                className="w-full px-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-[#3D5AFE] transition-all text-gray-900"
                 required
               />
             </div>
           </div>
 
-          <div className="bg-blue-50/50 border border-blue-100 p-6 rounded-3xl">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-6 h-6 bg-[#3D5AFE] rounded-full flex items-center justify-center text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"/><path d="m17 17-5 5-5-5"/><path d="m17 7-5-5-5-5"/></svg>
-              </div>
-              <p className="text-xs font-black text-blue-900 uppercase tracking-tight">
-                Fixer l'erreur 404 Nginx
-              </p>
-            </div>
-            <p className="text-[11px] text-blue-700 leading-relaxed mb-4">
-              Pour que <code>/votre-nom</code> fonctionne après un F5, ajoutez cette règle dans votre fichier de configuration Nginx (bloc <code>server</code>) :
-            </p>
-            <pre className="bg-gray-900 text-blue-300 p-4 rounded-2xl text-[10px] font-mono overflow-x-auto shadow-inner">
-{`location / {
-  try_files $uri $uri/ /index.html;
-}`}
-            </pre>
-            <p className="text-[10px] text-blue-500 mt-4 italic">
-              Sans cela, le site affichera 404 car il cherchera un fichier réel au lieu de laisser React gérer la route.
-            </p>
+          <div className="bg-amber-50 border border-amber-100 p-6 rounded-3xl">
+             <div className="flex items-start gap-3">
+               <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-white flex-shrink-0 mt-0.5 font-bold text-xs">!</div>
+               <div>
+                  <p className="text-xs font-black text-amber-900 uppercase tracking-tight mb-2">Pourquoi cette étape ?</p>
+                  <p className="text-[11px] text-amber-800 leading-relaxed italic">
+                    Si vous voyez "No available server", cela signifie que le serveur de base de données partagé est saturé ou en pause. Utiliser vos propres clés résoudra ce problème définitivement.
+                  </p>
+               </div>
+             </div>
           </div>
 
           <button 
             type="submit" 
             className="w-full py-5 bg-[#3D5AFE] hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-100 transition-all active:scale-95"
           >
-            Enregistrer & Actualiser
+            Enregistrer & Redémarrer
           </button>
         </form>
       </div>
