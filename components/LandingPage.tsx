@@ -1,10 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface LandingPageProps {
   onGetStarted: () => void;
 }
 
+const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="border-b border-white/5 last:border-0">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full py-8 flex items-center justify-between text-left group transition-all"
+      >
+        <span className={`text-lg lg:text-xl font-bold transition-colors ${isOpen ? 'text-purple-400' : 'text-white group-hover:text-purple-200'}`}>
+          {question}
+        </span>
+        <div className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center transition-transform duration-300 ${isOpen ? 'rotate-180 bg-purple-500 border-purple-500' : ''}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </button>
+      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[500px] pb-8 opacity-100' : 'max-h-0 opacity-0'}`}>
+        <p className="text-gray-400 leading-relaxed text-base lg:text-lg max-w-4xl">
+          {answer}
+        </p>
+      </div>
+    </div>
+  );
+};
+
 const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
+  const faqs = [
+    {
+      question: "Qu’est-ce qu’une vCard et pourquoi est-elle essentielle aujourd’hui ?",
+      answer: "Une vCard est une carte de visite numérique interactive qui centralise toutes vos informations professionnelles : photo, description, liens, réseaux sociaux, boutique, portfolio, QR code, etc. Contrairement à une carte papier, elle ne se perd jamais et s’actualise en un clic. Pour une femme entrepreneure, c’est un outil puissant de crédibilité, de réseau et de conversion client."
+    },
+    {
+      question: "En quoi une vCard est-elle meilleure qu’un simple profil LinkedIn ?",
+      answer: "LinkedIn vous appartient… jusqu’à ce que l’algorithme change. Une vCard, elle, vous appartient à 100 % : vous contrôlez l’apparence, les données, et l’expérience de vos visiteurs. Elle devient votre carte de marque personnelle, que vous pouvez partager partout — sur vos réseaux, dans vos emails, ou même via un QR code sur vos produits."
+    },
+    {
+      question: "Puis-je utiliser une vCard même si je débute dans mon activité ?",
+      answer: "Absolument. Une vCard ne sert pas uniquement aux marques établies. C’est un levier de professionnalisation immédiat : elle permet de présenter votre activité avec élégance, même à ses débuts, et de prouver votre sérieux face à vos premiers partenaires ou clients. Elle évolue avec vous, comme un mini-site toujours à jour."
+    },
+    {
+      question: "Est-ce difficile à créer ou à personnaliser ?",
+      answer: "Non, c’est conçu pour être simple, intuitif et sans compétences techniques. En quelques minutes, vous choisissez un modèle, ajoutez vos informations, vos liens, vos couleurs et votre photo. Votre vCard est ensuite accessible partout, même depuis un smartphone. Vous pouvez la modifier à tout moment pour suivre votre évolution."
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-[#0A0118] text-white selection:bg-purple-500/30 overflow-x-hidden font-['Plus_Jakarta_Sans']">
       {/* Background VFX */}
@@ -61,10 +105,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
           {/* Right Visual Content (VCard composition) */}
           <div className="relative perspective-[2000px] hidden lg:block animate-in fade-in slide-in-from-right-10 duration-1000 delay-200">
-            {/* Ambient Background Glow for the Card */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-            {/* Engagement Metrics Bubbles */}
             <div className="absolute -top-10 left-0 z-20 bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-3xl shadow-2xl animate-bounce" style={{ animationDuration: '4s' }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center text-green-400">
@@ -77,12 +119,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               </div>
             </div>
 
-            {/* Tilted VCard Model */}
             <div 
               className="relative w-[400px] h-[550px] mx-auto bg-gradient-to-br from-[#1E0B3B] to-[#0A0118] border border-white/10 rounded-[4rem] shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden transform rotate-y-[-25deg] rotate-x-[15deg] rotate-z-[-5deg] hover:rotate-y-[-10deg] transition-transform duration-700"
               style={{ transformStyle: 'preserve-3d' }}
             >
-              {/* Card Inner Content (Mockup) */}
               <div className="absolute top-0 left-0 w-full h-full p-10 flex flex-col items-center">
                 <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full border-4 border-white/10 mb-8 overflow-hidden">
                   <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" alt="Avatar" className="w-full h-full object-cover" />
@@ -109,8 +149,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   <div className="text-[8px] font-black uppercase tracking-[0.5em] text-white">WomenCards Engine</div>
                 </div>
               </div>
-
-              {/* Shine Effect */}
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none"></div>
             </div>
           </div>
@@ -120,7 +158,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       {/* Feature Cards Section */}
       <section className="relative pb-32 px-6 lg:px-20 z-10">
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
-          {/* Card 1 */}
           <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] hover:bg-white/10 transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl"></div>
             <h3 className="text-xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-purple-400 transition-colors">Créez votre vCard digitale</h3>
@@ -129,7 +166,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </p>
           </div>
 
-          {/* Card 2 */}
           <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] hover:bg-white/10 transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl"></div>
             <h3 className="text-xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-blue-400 transition-colors">Pourquoi?</h3>
@@ -138,13 +174,27 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </p>
           </div>
 
-          {/* Card 3 */}
           <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] hover:bg-white/10 transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl"></div>
             <h3 className="text-xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-pink-400 transition-colors">Quelle cible</h3>
             <p className="text-gray-400 leading-relaxed font-medium">
               Idéale pour les événements, réseaux sociaux, signatures d’email ou pitch rapide.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="relative pb-40 px-6 lg:px-20 z-10">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl lg:text-6xl font-black tracking-tighter uppercase mb-6">FAQ</h2>
+            <div className="w-20 h-1.5 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto rounded-full"></div>
+          </div>
+          <div className="space-y-2 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[3rem] p-8 lg:p-12">
+            {faqs.map((faq, index) => (
+              <FAQItem key={index} question={faq.question} answer={faq.answer} />
+            ))}
           </div>
         </div>
       </section>
