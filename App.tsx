@@ -19,10 +19,11 @@ const App: React.FC = () => {
   const [userAuthEmail, setUserAuthEmail] = useState<string>('');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
-  const [activeEditorTab, setActiveEditorTab] = useState<'profile' | 'links'>('profile');
+  const [activeEditorTab, setActiveEditorTab] = useState<'profile' | 'links' | 'theme'>('profile');
   
   const [isPublicView, setIsPublicView] = useState(false);
   const [isAdminView, setIsAdminView] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // Pour mobile
   const [publicUsername, setPublicUsername] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
@@ -67,7 +68,6 @@ const App: React.FC = () => {
 
       setLoading(true);
       try {
-        // Timeout de 5s pour éviter l'écran de chargement infini si Supabase est down
         const sessionPromise = supabase.auth.getSession();
         const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Supabase")), 5000));
         
@@ -207,9 +207,7 @@ const App: React.FC = () => {
       <>
         <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={(id) => { setUserId(id); fetchProfile(id); }} />
         <ConfigModal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} />
-        <LandingPage 
-          onGetStarted={() => setIsAuthModalOpen(true)} 
-        />
+        <LandingPage onGetStarted={() => setIsAuthModalOpen(true)} />
         {dbError && !isSupabaseConfigured() && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-red-500/10 border border-red-500/20 backdrop-blur-xl px-6 py-3 rounded-full flex items-center gap-4 z-50">
              <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">Base de données non configurée ou inactive</span>
@@ -220,7 +218,6 @@ const App: React.FC = () => {
     );
   }
 
-  // URL DE PROFIL FORCÉE SUR LE DOMAINE FINAL
   const fullProfileUrl = `https://www.women.cards/${profile.username}`;
 
   return (
@@ -228,21 +225,22 @@ const App: React.FC = () => {
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={(id) => { setUserId(id); fetchProfile(id); }} />
       <ConfigModal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} />
       
-      <header className="h-16 border-b border-white/5 bg-[#0A0118]/80 backdrop-blur-3xl flex items-center px-8 justify-between flex-shrink-0 z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg">W</div>
-          <h1 className="font-black text-lg tracking-tighter">WomenCards<span className="text-purple-500">.</span></h1>
+      {/* Header Responsif */}
+      <header className="h-16 lg:h-20 border-b border-white/5 bg-[#0A0118]/80 backdrop-blur-3xl flex items-center px-4 lg:px-8 justify-between flex-shrink-0 z-20">
+        <div className="flex items-center gap-2 lg:gap-3">
+          <div className="w-8 h-8 lg:w-9 lg:h-9 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg">W</div>
+          <h1 className="font-black text-sm lg:text-lg tracking-tighter hidden xs:block">WomenCards<span className="text-purple-500">.</span></h1>
         </div>
         
-        <div className="flex gap-6 items-center">
+        <div className="flex gap-2 lg:gap-6 items-center">
           <button onClick={() => setIsConfigModalOpen(true)} className="w-8 h-8 flex items-center justify-center text-white/20 hover:text-white transition-colors" title="Configuration">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
-          <button onClick={() => { supabase.auth.signOut().then(() => { setUserId(''); window.location.href = '/'; }); }} className="text-[10px] font-black text-gray-500 hover:text-white uppercase tracking-widest transition-colors">Déconnexion</button>
+          <button onClick={() => { supabase.auth.signOut().then(() => { setUserId(''); window.location.href = '/'; }); }} className="text-[9px] lg:text-[10px] font-black text-gray-500 hover:text-white uppercase tracking-widest transition-colors hidden sm:block">Déconnexion</button>
           <button 
             onClick={handleSave} 
             disabled={saving} 
-            className={`text-[11px] font-black px-10 py-2.5 rounded-full transition-all shadow-xl ${saveSuccess ? 'bg-green-500 text-white' : 'bg-white text-[#0A0118] hover:scale-105 active:scale-95 disabled:opacity-50 border border-white'}`}
+            className={`text-[9px] lg:text-[11px] font-black px-4 lg:px-10 py-2 lg:py-2.5 rounded-full transition-all shadow-xl ${saveSuccess ? 'bg-green-500 text-white' : 'bg-white text-[#0A0118] hover:scale-105 active:scale-95 disabled:opacity-50 border border-white'}`}
           >
             {saving ? 'SYNC...' : saveSuccess ? 'PUBLIÉ' : 'PUBLIER'}
           </button>
@@ -250,58 +248,60 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 flex overflow-hidden">
-        {/* Sidebar */}
+        {/* Sidebar / Main Editor - Occupe tout l'écran sur mobile */}
         <div className="w-full lg:w-[420px] bg-[#120526]/40 border-r border-white/5 flex flex-col flex-shrink-0 overflow-hidden backdrop-blur-3xl">
-          <div className="px-10 pt-8 pb-4 border-b border-white/5 flex gap-12">
+          <div className="px-6 lg:px-10 pt-6 lg:pt-8 pb-4 border-b border-white/5 flex gap-8 lg:gap-12 overflow-x-auto scrollbar-hide">
             <button 
               onClick={() => setActiveEditorTab('profile')}
-              className={`pb-4 text-[10px] font-black uppercase tracking-[0.2em] relative transition-all ${activeEditorTab === 'profile' ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}
+              className={`pb-4 text-[9px] lg:text-[10px] font-black uppercase tracking-[0.2em] relative transition-all whitespace-nowrap ${activeEditorTab === 'profile' ? 'text-white' : 'text-gray-500'}`}
             >
               PROFIL
-              {activeEditorTab === 'profile' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500 rounded-full shadow-[0_0_10px_#A855F7]"></div>}
+              {activeEditorTab === 'profile' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500 rounded-full"></div>}
             </button>
             <button 
               onClick={() => setActiveEditorTab('links')}
-              className={`pb-4 text-[10px] font-black uppercase tracking-[0.2em] relative transition-all ${activeEditorTab === 'links' ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}
+              className={`pb-4 text-[9px] lg:text-[10px] font-black uppercase tracking-[0.2em] relative transition-all whitespace-nowrap ${activeEditorTab === 'links' ? 'text-white' : 'text-gray-500'}`}
             >
               LIENS
-              {activeEditorTab === 'links' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500 rounded-full shadow-[0_0_10px_#A855F7]"></div>}
+              {activeEditorTab === 'links' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500 rounded-full"></div>}
+            </button>
+            {/* THÈME AJOUTÉ POUR MOBILE/TABLETTE */}
+            <button 
+              onClick={() => setActiveEditorTab('theme')}
+              className={`pb-4 text-[9px] lg:text-[10px] font-black uppercase tracking-[0.2em] relative transition-all whitespace-nowrap ${activeEditorTab === 'theme' ? 'text-white' : 'text-gray-500'}`}
+            >
+              THÈME
+              {activeEditorTab === 'theme' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500 rounded-full"></div>}
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-10 scrollbar-hide">
+          <div className="flex-1 overflow-y-auto p-6 lg:p-10 scrollbar-hide">
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               {activeEditorTab === 'profile' ? (
                 <ProfileSection profile={profile} setProfile={setProfile} />
-              ) : (
+              ) : activeEditorTab === 'links' ? (
                 <LinksSection profile={profile} setProfile={setProfile} />
+              ) : (
+                <div className="pb-20 lg:pb-0">
+                  <ThemeSection profile={profile} setProfile={setProfile} />
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Preview Container - LIEN DÉPLACÉ EN DESSOUS DU GSM */}
+        {/* Preview Container - Desktop Only */}
         <div className="hidden lg:flex flex-1 bg-[#05010D] items-center justify-center relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[160px]"></div>
-          
           <div className="relative z-10 flex flex-col items-center gap-8 animate-in zoom-in duration-1000">
-             
-             {/* SIMULATEUR GSM */}
              <div className="scale-[0.8] xl:scale-[0.85] drop-shadow-[0_60px_100px_rgba(0,0,0,0.8)] border-[14px] border-[#120526] rounded-[5rem] bg-black overflow-hidden shadow-2xl ring-1 ring-white/10">
                 <PhonePreview profile={profile} />
              </div>
-
-             {/* LE LIEN AU DESSOUS DU GSM */}
              <div className="w-full max-w-[320px]">
-               <button 
-                onClick={() => window.open(fullProfileUrl, '_blank')}
-                className="w-full bg-white/5 backdrop-blur-3xl px-6 py-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-all active:scale-95 shadow-2xl flex items-center justify-between"
-               >
-                  <div className="flex flex-col items-start gap-1 overflow-hidden">
+               <button onClick={() => window.open(fullProfileUrl, '_blank')} className="w-full bg-white/5 backdrop-blur-3xl px-6 py-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-all flex items-center justify-between">
+                  <div className="flex flex-col items-start gap-1 overflow-hidden text-left">
                     <span className="text-[9px] font-black text-purple-400 uppercase tracking-widest">Lien de profil :</span>
-                    <p className="text-[11px] font-bold text-white truncate max-w-full">
-                      www.women.cards/{profile.username}
-                    </p>
+                    <p className="text-[11px] font-bold text-white truncate max-w-full">women.cards/{profile.username}</p>
                   </div>
                   <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center group-hover:bg-purple-500 transition-colors">
                     <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
@@ -311,7 +311,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Theme Sidebar */}
+        {/* Theme Sidebar - Desktop Only (XL) */}
         <div className="hidden xl:flex w-[380px] bg-[#0F0421]/40 border-l border-white/5 flex-col flex-shrink-0 overflow-y-auto backdrop-blur-3xl">
           <div className="p-10">
             <h2 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-10">Moteur de Thèmes</h2>
@@ -319,6 +319,32 @@ const App: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* MOBILE PREVIEW BUTTON & MODAL */}
+      <button 
+        onClick={() => setIsPreviewModalOpen(true)}
+        className="lg:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full shadow-2xl flex items-center justify-center text-white z-50 border-2 border-white/20 active:scale-90 transition-transform"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+
+      {isPreviewModalOpen && (
+        <div className="fixed inset-0 z-[100] bg-black lg:hidden animate-in fade-in duration-300">
+           <div className="absolute top-6 right-6 z-[110]">
+              <button 
+                onClick={() => setIsPreviewModalOpen(false)}
+                className="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-full flex items-center justify-center text-white border border-white/10"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+           </div>
+           <div className="w-full h-full flex items-center justify-center p-4">
+              <div className="w-full h-full max-w-[380px] max-h-[780px] relative rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-white/10 border-4 border-[#120526]">
+                <PhonePreview profile={profile} />
+              </div>
+           </div>
+        </div>
+      )}
     </div>
   );
 };
