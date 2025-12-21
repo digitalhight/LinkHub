@@ -7,7 +7,6 @@ import PublicProfile from './components/PublicProfile';
 import LandingPage from './components/LandingPage';
 import AdminDashboard from './components/AdminDashboard';
 import { AuthModal } from './components/AuthModal';
-import { ConfigModal } from './components/ConfigModal';
 import { supabase, isSupabaseConfigured } from './utils/supabaseClient';
 
 const App: React.FC = () => {
@@ -18,7 +17,6 @@ const App: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
   const [userAuthEmail, setUserAuthEmail] = useState<string>('');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   
   const [isPublicView, setIsPublicView] = useState(false);
   const [isAdminView, setIsAdminView] = useState(false);
@@ -144,7 +142,7 @@ const App: React.FC = () => {
         bio: profile.bio,
         avatar_url: profile.avatarUrl,
         phone: profile.phone,
-        email: profile.email || userAuthEmail, // Backup with auth email
+        email: profile.email || userAuthEmail,
         links: profile.links,
         theme: profile.theme,
         updated_at: new Date().toISOString(),
@@ -175,17 +173,9 @@ const App: React.FC = () => {
     return <PublicProfile profile={profile} notFound={notFound} />;
   }
 
-  // Vérification de l'accès Admin
   if (isAdminView) {
     const isAdmin = profile.is_admin || userAuthEmail === 'digitalhight2025@gmail.com';
-    
-    // Si pas encore connecté, on redirige vers l'accueil pour login
-    if (!userId) {
-      window.location.href = '/';
-      return null;
-    }
-    
-    // Si connecté mais pas admin
+    if (!userId) { window.location.href = '/'; return null; }
     if (!isAdmin) {
       return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-10 text-center">
@@ -193,12 +183,11 @@ const App: React.FC = () => {
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
           <h2 className="text-2xl font-black text-gray-900 mb-2">Accès Refusé</h2>
-          <p className="text-gray-500 max-w-xs mb-8 font-medium">Vous n'avez pas les permissions nécessaires pour accéder à cet espace.</p>
-          <button onClick={() => window.location.href = '/'} className="px-8 py-3 bg-gray-900 text-white rounded-full font-black text-xs uppercase tracking-widest shadow-xl">Retour à l'accueil</button>
+          <p className="text-gray-500 max-w-xs mb-8 font-medium">Vous n'avez pas les permissions nécessaires.</p>
+          <button onClick={() => window.location.href = '/'} className="px-8 py-3 bg-gray-900 text-white rounded-full font-black text-xs uppercase tracking-widest shadow-xl">Retour</button>
         </div>
       );
     }
-    
     return <AdminDashboard currentUser={profile} />;
   }
 
@@ -215,7 +204,6 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-gray-50 font-['Plus_Jakarta_Sans']">
-      <ConfigModal isOpen={isConfigModalOpen} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={(id) => { setUserId(id); fetchProfile(id); }} />
       
       <header className="h-16 border-b border-gray-100 bg-white flex items-center px-6 justify-between flex-shrink-0 z-20 shadow-sm">
@@ -242,9 +230,6 @@ const App: React.FC = () => {
             className={`text-[11px] font-black px-8 py-2.5 rounded-full transition-all shadow-xl ${saveSuccess ? 'bg-green-500 text-white shadow-green-100' : 'bg-[#3D5AFE] text-white shadow-blue-100 active:scale-95 disabled:opacity-50'}`}
           >
             {saving ? 'PROCESS...' : saveSuccess ? 'SAUVEGARDÉ !' : 'ENREGISTRER'}
-          </button>
-          <button className="p-2 text-gray-300 hover:text-[#3D5AFE] transition-colors" onClick={() => setIsConfigModalOpen(true)}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </button>
         </div>
       </header>
