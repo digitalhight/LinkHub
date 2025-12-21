@@ -5,6 +5,7 @@ import PhonePreview from './components/PhonePreview';
 import { ProfileSection, LinksSection, ThemeSection } from './components/EditorSections';
 import PublicProfile from './components/PublicProfile';
 import LandingPage from './components/LandingPage';
+import AdminDashboard from './components/AdminDashboard';
 import { AuthModal } from './components/AuthModal';
 import { ConfigModal } from './components/ConfigModal';
 import { supabase, isSupabaseConfigured } from './utils/supabaseClient';
@@ -19,18 +20,22 @@ const App: React.FC = () => {
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   
   const [isPublicView, setIsPublicView] = useState(false);
+  const [isAdminView, setIsAdminView] = useState(false);
   const [publicUsername, setPublicUsername] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
-
-  // Pour le mode mobile uniquement
-  const [activeTab, setActiveTab] = useState<EditorTab>(EditorTab.PROFILE);
 
   useEffect(() => {
     const checkRouting = () => {
       const pathSegments = window.location.pathname.split('/').filter(Boolean);
       let candidate = pathSegments.length > 0 ? pathSegments[0] : null;
-      const hash = window.location.hash.replace('#/', '').replace('#', '').trim();
       
+      if (candidate === 'admin') {
+        setIsAdminView(true);
+        setIsPublicView(false);
+        return;
+      }
+
+      const hash = window.location.hash.replace('#/', '').replace('#', '').trim();
       if (!candidate && hash) {
         candidate = hash;
         try { window.history.replaceState(null, '', `/${hash}`); } catch (e) {}
@@ -41,10 +46,12 @@ const App: React.FC = () => {
         const isReserved = ['index.html', 'auth', 'login', 'api', 'admin', 'assets', 'static'].includes(segment);
         if (!isReserved && !segment.includes('.') && segment.length >= 3) {
           setIsPublicView(true);
+          setIsAdminView(false);
           setPublicUsername(segment);
           return;
         }
       }
+      setIsAdminView(false);
       setIsPublicView(false);
     };
 
@@ -112,6 +119,7 @@ const App: React.FC = () => {
       const { data } = await supabase.from('profiles').select('*').eq('id', id).maybeSingle();
       if (data) {
         setProfile({
+          id: data.id,
           name: data.name || INITIAL_PROFILE.name,
           username: data.username || INITIAL_PROFILE.username,
           bio: data.bio || INITIAL_PROFILE.bio,
@@ -120,6 +128,7 @@ const App: React.FC = () => {
           email: data.email || INITIAL_PROFILE.email,
           links: data.links || [],
           theme: data.theme || INITIAL_PROFILE.theme,
+          is_admin: data.is_admin || false,
         });
       }
     } catch (err) {}
@@ -168,6 +177,14 @@ const App: React.FC = () => {
     return <PublicProfile profile={profile} notFound={notFound} />;
   }
 
+  if (isAdminView) {
+    if (!profile.is_admin && profile.email !== 'digitalhight2025@gmail.com') {
+      window.location.href = '/';
+      return null;
+    }
+    return <AdminDashboard currentUser={profile} />;
+  }
+
   if (!userId) {
     return (
       <>
@@ -177,7 +194,6 @@ const App: React.FC = () => {
     );
   }
 
-  // URL de profil dynamique
   const fullProfileUrl = `${window.location.origin}/${profile.username}`;
 
   return (
@@ -193,7 +209,15 @@ const App: React.FC = () => {
         </div>
         
         <div className="flex gap-4 items-center">
-          <button onClick={() => { supabase.auth.signOut(); setUserId(''); setProfile(INITIAL_PROFILE); }} className="text-[10px] font-black text-gray-400 hover:text-red-500 uppercase tracking-widest transition-colors">Déconnexion</button>
+          {profile.is_admin && (
+            <button 
+              onClick={() => window.location.href = '/admin'} 
+              className="text-[10px] font-black text-amber-600 hover:text-amber-700 uppercase tracking-widest px-4 py-2 bg-amber-50 rounded-lg transition-colors border border-amber-100"
+            >
+              Mode Admin
+            </button>
+          )}
+          <button onClick={() => { supabase.auth.signOut(); setUserId(''); setProfile(INITIAL_PROFILE); window.location.href = '/'; }} className="text-[10px] font-black text-gray-400 hover:text-red-500 uppercase tracking-widest transition-colors">Déconnexion</button>
           <button 
             onClick={handleSave} 
             disabled={saving} 

@@ -18,6 +18,7 @@ export interface ThemeConfig {
 }
 
 export interface UserProfile {
+  id?: string;
   name: string;
   username: string;
   bio: string;
@@ -26,6 +27,8 @@ export interface UserProfile {
   email?: string;
   links: LinkItem[];
   theme: ThemeConfig;
+  is_admin?: boolean;
+  created_at?: string;
 }
 
 export enum EditorTab {
