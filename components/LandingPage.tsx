@@ -7,94 +7,89 @@ interface LandingPageProps {
 const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   return (
     <div className="min-h-screen bg-[#0A0118] text-white selection:bg-purple-500/30 overflow-x-hidden font-['Plus_Jakarta_Sans']">
-      {/* Cinematic Background Orbs */}
+      {/* Background VFX */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] bg-purple-600/20 rounded-full blur-[160px] animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-blue-600/10 rounded-full blur-[140px]"></div>
-        <div className="absolute top-[20%] right-[5%] w-[30%] h-[30%] bg-pink-600/10 rounded-full blur-[120px] animate-bounce" style={{ animationDuration: '10s' }}></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-purple-600/10 rounded-full blur-[160px] animate-pulse"></div>
+        <div className="absolute bottom-[-20%] right-[-10%] w-[80%] h-[80%] bg-blue-600/10 rounded-full blur-[180px]"></div>
+        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-px h-[1000px] bg-gradient-to-b from-transparent via-purple-500/20 to-transparent rotate-45"></div>
       </div>
 
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-[#0A0118]/40 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-10">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(168,85,247,0.4)]">W</div>
-              <span className="font-black text-2xl tracking-tighter">WomenCards.</span>
-            </div>
-            <div className="hidden lg:flex items-center gap-8 text-xs font-black uppercase tracking-widest text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">Home</a>
-              <a href="#" className="hover:text-white transition-colors">Product</a>
-              <a href="#" className="hover:text-white transition-colors">Pricing</a>
-              <a href="#" className="hover:text-white transition-colors">Resources</a>
-            </div>
+      {/* Navigation - Minimal Version */}
+      <nav className="fixed top-0 w-full z-50 bg-[#0A0118]/60 backdrop-blur-2xl border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-10 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-transform hover:rotate-12 cursor-pointer">W</div>
+            <span className="font-black text-2xl tracking-tighter">WomenCards<span className="text-purple-500">.</span></span>
           </div>
           <div className="flex items-center gap-6">
-            <button onClick={onGetStarted} className="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-white">Sign In</button>
             <button 
               onClick={onGetStarted}
-              className="bg-white text-[#0A0118] px-8 py-3.5 rounded-full text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95"
+              className="bg-white text-[#0A0118] px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95 border border-white"
             >
-              Get Started
+              Démarrer
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Content */}
       <section className="relative pt-48 pb-32 px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-10 animate-in fade-in slide-in-from-top-4 duration-1000">
-            <span className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-ping"></span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-purple-300">Beta Access Now Live</span>
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 mb-12 backdrop-blur-md animate-in fade-in slide-in-from-top-6 duration-1000">
+            <span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse shadow-[0_0_10px_#A855F7]"></span>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-purple-200">Intelligence Artificielle Native</span>
           </div>
           
-          <h1 className="text-6xl lg:text-[7rem] font-black leading-[0.9] tracking-tighter mb-10 uppercase animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <h1 className="text-6xl lg:text-[8rem] font-extrabold leading-[0.85] tracking-tighter mb-12 uppercase animate-in fade-in slide-in-from-bottom-10 duration-700">
             Next-Gen AI <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500">For Creators</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">Pour Créatrices</span>
           </h1>
           
-          <p className="text-lg lg:text-xl text-gray-400 mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
-            Stay ahead of the curve with AI-powered profile insights. Centralize your presence with real-time analytics and global compliance.
+          <p className="text-lg lg:text-xl text-gray-400 mb-16 leading-relaxed max-w-2xl mx-auto font-medium">
+            Propulsez votre présence digitale avec des insights IA. Centralisez vos liens dans un catalogue ultra-moderne, sécurisé et performant.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-24">
             <button 
               onClick={onGetStarted}
-              className="w-full sm:w-auto px-12 py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl font-black text-lg hover:shadow-[0_0_40px_rgba(147,51,234,0.4)] transition-all active:scale-95"
+              className="w-full sm:w-auto px-14 py-6 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-3xl font-black text-lg hover:shadow-[0_0_50px_rgba(147,51,234,0.3)] transition-all active:scale-95 group flex items-center justify-center gap-3"
             >
-              Get started
+              Commencer maintenant
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
-            <button className="w-full sm:w-auto px-12 py-5 bg-white/5 border border-white/10 rounded-2xl font-black text-lg hover:bg-white/10 transition-all">
-              Book A Demo
+            <button className="w-full sm:w-auto px-14 py-6 bg-white/5 border border-white/10 rounded-3xl font-black text-lg hover:bg-white/10 transition-all backdrop-blur-sm">
+              Voir Démo
             </button>
           </div>
 
-          {/* Featured UI Mockup (Matching the image) */}
-          <div className="relative max-w-5xl mx-auto animate-in zoom-in-95 duration-1000 delay-300">
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0118] via-transparent to-transparent z-10 h-64 top-auto -bottom-1"></div>
-            <div className="bg-[#120526]/80 backdrop-blur-3xl border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl shadow-purple-900/20">
-              <div className="h-14 border-b border-white/5 flex items-center px-8 justify-between">
+          {/* Futuristic Preview */}
+          <div className="relative max-w-4xl mx-auto animate-in zoom-in-95 duration-1000 delay-300">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0118] via-transparent to-transparent z-10"></div>
+            <div className="bg-[#120526]/60 backdrop-blur-3xl border border-white/10 rounded-[3rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.6)]">
+              <div className="h-14 border-b border-white/5 flex items-center px-8 justify-between bg-white/5">
                 <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/20"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/20"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500/20"></div>
+                  <div className="w-3 h-3 rounded-full bg-red-500/40"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/40"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500/40"></div>
                 </div>
-                <div className="px-4 py-1.5 bg-white/5 rounded-full text-[10px] font-black text-gray-500">womencards.digital/amina</div>
+                <div className="px-5 py-2 bg-white/5 rounded-full text-[10px] font-black text-gray-500 tracking-widest uppercase">womencards.ai/amina</div>
               </div>
-              <div className="p-10 text-left">
-                <div className="grid lg:grid-cols-4 gap-10">
-                  <div className="space-y-6">
-                    <div className="w-12 h-12 bg-purple-500/20 rounded-xl"></div>
+              <div className="p-12 text-left">
+                <div className="grid lg:grid-cols-4 gap-12">
+                  <div className="space-y-8">
+                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500/30 to-blue-500/30 rounded-2xl border border-white/10 flex items-center justify-center text-purple-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                    </div>
                     <div className="h-4 w-full bg-white/5 rounded-full"></div>
-                    <div className="h-4 w-3/4 bg-white/5 rounded-full"></div>
-                    <div className="h-4 w-1/2 bg-white/5 rounded-full"></div>
+                    <div className="h-4 w-4/5 bg-white/5 rounded-full"></div>
+                    <div className="h-4 w-3/5 bg-white/5 rounded-full"></div>
                   </div>
                   <div className="lg:col-span-3">
-                    <div className="h-64 w-full bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-[2rem] border border-white/5 flex items-center justify-center">
-                       <div className="text-center">
-                         <div className="text-4xl font-black text-white mb-2">84.2%</div>
-                         <div className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Growth Factor</div>
+                    <div className="h-72 w-full bg-gradient-to-br from-purple-600/10 via-blue-600/5 to-transparent rounded-[2.5rem] border border-white/5 flex items-center justify-center relative overflow-hidden">
+                       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,#A855F7_0%,transparent_70%)] opacity-10"></div>
+                       <div className="text-center z-10">
+                         <div className="text-5xl font-black text-white mb-2 tracking-tighter">98.5%</div>
+                         <div className="text-[11px] font-black text-purple-400 uppercase tracking-[0.3em]">Indice de Confiance AI</div>
                        </div>
                     </div>
                   </div>
@@ -105,13 +100,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-20 border-t border-white/5 text-center">
-        <div className="flex items-center justify-center gap-2 mb-6">
-           <div className="w-6 h-6 bg-purple-600 rounded-lg flex items-center justify-center text-white text-xs font-black">W</div>
-           <span className="font-black tracking-tighter opacity-50">womencards.</span>
+      {/* Simplified Footer */}
+      <footer className="py-24 border-t border-white/5 text-center bg-[#0A0118]">
+        <div className="flex items-center justify-center gap-3 mb-8">
+           <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center text-white text-sm font-black shadow-lg shadow-purple-900/40">W</div>
+           <span className="font-black text-xl tracking-tighter">womencards.</span>
         </div>
-        <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em]">© 2024 Next-Gen AI Collective</p>
+        <div className="flex justify-center gap-10 text-[10px] font-black text-gray-500 uppercase tracking-widest mb-10">
+          <a href="#" className="hover:text-white transition-colors">Confidentialité</a>
+          <a href="#" className="hover:text-white transition-colors">Support</a>
+          <a href="#" className="hover:text-white transition-colors">API</a>
+        </div>
+        <p className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em]">© 2024 Global Creators Collective</p>
       </footer>
     </div>
   );
