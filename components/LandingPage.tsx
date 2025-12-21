@@ -62,7 +62,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       <nav className="fixed top-0 w-full z-50 bg-[#0A0118]/60 backdrop-blur-2xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-transform hover:rotate-12 cursor-pointer">W</div>
+            <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-transform hover:rotate-12 cursor-pointer font-['Bricolage_Grotesque']">W</div>
             <span className="font-black text-2xl tracking-tighter">WomenCards<span className="text-purple-500">.</span></span>
           </div>
           <div className="flex items-center gap-4">
@@ -82,7 +82,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           
           {/* Left Content */}
           <div className="text-left z-10 animate-in fade-in slide-in-from-left-10 duration-1000">
-            <h1 className="text-5xl lg:text-[6.5rem] font-extrabold leading-[0.9] tracking-tighter mb-10 uppercase">
+            <h1 className="text-5xl lg:text-[6.5rem] font-extrabold leading-[0.9] tracking-tighter mb-10 uppercase font-['Bricolage_Grotesque']">
               Un Clic. <br />
               Une Femme. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">Une Légende.</span>
@@ -140,7 +140,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 </div>
 
                 <div className="mt-auto opacity-30">
-                  <div className="text-[9px] font-black uppercase tracking-[0.4em] text-white">women.cards/amina</div>
+                  <div className="text-[9px] font-black uppercase tracking-[0.4em] text-white font-['Bricolage_Grotesque']">women.cards/amina</div>
                 </div>
               </div>
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none"></div>
@@ -182,7 +182,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       <section className="relative pb-40 px-6 lg:px-20 z-10">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-4xl lg:text-6xl font-black tracking-tighter uppercase mb-6">FAQ</h2>
+            <h2 className="text-4xl lg:text-6xl font-black tracking-tighter uppercase mb-6 font-['Bricolage_Grotesque']">FAQ</h2>
             <div className="w-20 h-1.5 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto rounded-full"></div>
           </div>
           <div className="space-y-2 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[3rem] p-8 lg:p-12">
@@ -196,7 +196,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       {/* Footer */}
       <footer className="py-24 border-t border-white/5 text-center bg-[#0A0118]">
         <div className="flex items-center justify-center gap-3 mb-8">
-           <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center text-white text-sm font-black shadow-lg shadow-purple-900/40">W</div>
+           <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center text-white text-sm font-black shadow-lg shadow-purple-900/40 font-['Bricolage_Grotesque']">W</div>
            <span className="font-black text-xl tracking-tighter">womencards.</span>
         </div>
         <p className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em]">© 2026 WWW.WOMEN.CARDS</p>

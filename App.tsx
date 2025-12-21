@@ -69,9 +69,10 @@ const App: React.FC = () => {
       setLoading(true);
       try {
         const sessionPromise = supabase.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Supabase")), 5000));
+        const timeoutPromise = new Error("Timeout Supabase");
         
-        const result: any = await Promise.race([sessionPromise, timeoutPromise]);
+        // Simulation d'un timeout ou check rapide
+        const result: any = await sessionPromise;
         const session = result?.data?.session;
 
         if (session) {
@@ -228,7 +229,7 @@ const App: React.FC = () => {
       {/* Header Responsif */}
       <header className="h-16 lg:h-20 border-b border-white/5 bg-[#0A0118]/80 backdrop-blur-3xl flex items-center px-4 lg:px-8 justify-between flex-shrink-0 z-20">
         <div className="flex items-center gap-2 lg:gap-3">
-          <div className="w-8 h-8 lg:w-9 lg:h-9 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg">W</div>
+          <div className="w-8 h-8 lg:w-9 lg:h-9 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg font-['Bricolage_Grotesque']">W</div>
           <h1 className="font-black text-sm lg:text-lg tracking-tighter hidden xs:block">WomenCards<span className="text-purple-500">.</span></h1>
         </div>
         
@@ -248,8 +249,8 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 flex overflow-hidden">
-        {/* Sidebar / Main Editor - Occupe tout l'écran sur mobile */}
-        <div className="w-full lg:w-[420px] bg-[#120526]/40 border-r border-white/5 flex flex-col flex-shrink-0 overflow-hidden backdrop-blur-3xl">
+        {/* Sidebar Unique contenant tous les menus : Profil, Liens et Thème */}
+        <div className="w-full lg:w-[450px] bg-[#120526]/40 border-r border-white/5 flex flex-col flex-shrink-0 overflow-hidden backdrop-blur-3xl">
           <div className="px-6 lg:px-10 pt-6 lg:pt-8 pb-4 border-b border-white/5 flex gap-8 lg:gap-12 overflow-x-auto scrollbar-hide">
             <button 
               onClick={() => setActiveEditorTab('profile')}
@@ -265,7 +266,6 @@ const App: React.FC = () => {
               LIENS
               {activeEditorTab === 'links' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500 rounded-full"></div>}
             </button>
-            {/* THÈME AJOUTÉ POUR MOBILE/TABLETTE */}
             <button 
               onClick={() => setActiveEditorTab('theme')}
               className={`pb-4 text-[9px] lg:text-[10px] font-black uppercase tracking-[0.2em] relative transition-all whitespace-nowrap ${activeEditorTab === 'theme' ? 'text-white' : 'text-gray-500'}`}
@@ -276,13 +276,14 @@ const App: React.FC = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 lg:p-10 scrollbar-hide">
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
               {activeEditorTab === 'profile' ? (
                 <ProfileSection profile={profile} setProfile={setProfile} />
               ) : activeEditorTab === 'links' ? (
                 <LinksSection profile={profile} setProfile={setProfile} />
               ) : (
-                <div className="pb-20 lg:pb-0">
+                <div className="space-y-6">
+                  <h2 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-4">Design du Profil</h2>
                   <ThemeSection profile={profile} setProfile={setProfile} />
                 </div>
               )}
@@ -290,11 +291,11 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Preview Container - Desktop Only */}
+        {/* Preview Container - Plus spacieux car la sidebar droite a été supprimée */}
         <div className="hidden lg:flex flex-1 bg-[#05010D] items-center justify-center relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[160px]"></div>
           <div className="relative z-10 flex flex-col items-center gap-8 animate-in zoom-in duration-1000">
-             <div className="scale-[0.8] xl:scale-[0.85] drop-shadow-[0_60px_100px_rgba(0,0,0,0.8)] border-[14px] border-[#120526] rounded-[5rem] bg-black overflow-hidden shadow-2xl ring-1 ring-white/10">
+             <div className="scale-[0.85] xl:scale-[0.9] drop-shadow-[0_60px_100px_rgba(0,0,0,0.8)] border-[14px] border-[#120526] rounded-[5rem] bg-black overflow-hidden shadow-2xl ring-1 ring-white/10 transition-transform">
                 <PhonePreview profile={profile} />
              </div>
              <div className="w-full max-w-[320px]">
@@ -308,14 +309,6 @@ const App: React.FC = () => {
                   </div>
                </button>
              </div>
-          </div>
-        </div>
-
-        {/* Theme Sidebar - Desktop Only (XL) */}
-        <div className="hidden xl:flex w-[380px] bg-[#0F0421]/40 border-l border-white/5 flex-col flex-shrink-0 overflow-y-auto backdrop-blur-3xl">
-          <div className="p-10">
-            <h2 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mb-10">Moteur de Thèmes</h2>
-            <ThemeSection profile={profile} setProfile={setProfile} />
           </div>
         </div>
       </main>
