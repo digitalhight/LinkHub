@@ -40,13 +40,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-purple-200">Intelligence Artificielle Native</span>
           </div>
           
-          <h1 className="text-6xl lg:text-[8rem] font-extrabold leading-[0.85] tracking-tighter mb-12 uppercase animate-in fade-in slide-in-from-bottom-10 duration-700">
-            Next-Gen AI <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">Pour Créatrices</span>
+          <h1 className="text-5xl lg:text-[7rem] font-extrabold leading-[0.85] tracking-tighter mb-12 uppercase animate-in fade-in slide-in-from-bottom-10 duration-700">
+            Un Clic. Une Femme. <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">Une Légende.</span>
           </h1>
           
-          <p className="text-lg lg:text-xl text-gray-400 mb-16 leading-relaxed max-w-2xl mx-auto font-medium">
-            Propulsez votre présence digitale avec des insights IA. Centralisez vos liens dans un catalogue ultra-moderne, sécurisé et performant.
+          <p className="text-lg lg:text-xl text-gray-400 mb-16 leading-relaxed max-w-3xl mx-auto font-medium">
+            Pour les femmes professionnelles actives sur plusieurs plateformes et qui veulent unifier leur présence en un seul lien.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-24">
