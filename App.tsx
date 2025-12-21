@@ -197,7 +197,7 @@ const App: React.FC = () => {
     );
   }
 
-  // Force le domaine correct pour l'URL de profil
+  // URL DE PROFIL FORCÉE SUR LE DOMAINE FINAL
   const fullProfileUrl = `https://www.women.cards/${profile.username}`;
 
   return (
@@ -253,19 +253,31 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Preview Container */}
+        {/* Preview Container - VERSION CORRIGÉE AVEC LIEN VISIBLE */}
         <div className="hidden lg:flex flex-1 bg-[#05010D] items-center justify-center relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[160px]"></div>
           
-          <div className="relative z-10 flex flex-col items-center gap-10 animate-in zoom-in duration-1000">
-             <div className="bg-white/5 backdrop-blur-3xl px-8 py-3.5 rounded-2xl border border-white/10 group cursor-pointer hover:bg-white/10 transition-all active:scale-95 shadow-2xl" onClick={() => window.open(fullProfileUrl, '_blank')}>
-                <p className="text-[11px] font-black text-gray-400 tracking-[0.2em] uppercase flex items-center gap-5">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]"></span>
-                  www.women.cards/{profile.username}
-                  <svg className="opacity-40 group-hover:opacity-100 transition-opacity" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
-                </p>
+          <div className="relative z-10 flex flex-col items-center gap-6 animate-in zoom-in duration-1000">
+             {/* LE LIEN AU DESSUS DU GSM */}
+             <div className="w-full max-w-[320px]">
+               <button 
+                onClick={() => window.open(fullProfileUrl, '_blank')}
+                className="w-full bg-white/5 backdrop-blur-3xl px-6 py-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-all active:scale-95 shadow-2xl flex items-center justify-between"
+               >
+                  <div className="flex flex-col items-start gap-1 overflow-hidden">
+                    <span className="text-[9px] font-black text-purple-400 uppercase tracking-widest">Lien de profil :</span>
+                    <p className="text-[11px] font-bold text-white truncate max-w-full">
+                      www.women.cards/{profile.username}
+                    </p>
+                  </div>
+                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center group-hover:bg-purple-500 transition-colors">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
+                  </div>
+               </button>
              </div>
-             <div className="scale-[0.85] xl:scale-95 drop-shadow-[0_60px_100px_rgba(0,0,0,0.8)] border-[16px] border-[#120526] rounded-[5rem] bg-black overflow-hidden shadow-2xl">
+
+             {/* SIMULATEUR GSM */}
+             <div className="scale-[0.8] xl:scale-[0.9] drop-shadow-[0_60px_100px_rgba(0,0,0,0.8)] border-[14px] border-[#120526] rounded-[5rem] bg-black overflow-hidden shadow-2xl ring-1 ring-white/10">
                 <PhonePreview profile={profile} />
              </div>
           </div>
