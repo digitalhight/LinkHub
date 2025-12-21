@@ -202,6 +202,7 @@ const App: React.FC = () => {
   }
 
   const fullProfileUrl = `https://www.women.cards/${profile.username}`;
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(fullProfileUrl)}&bgcolor=120526&color=ffffff&margin=10`;
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#0A0118] font-['Plus_Jakarta_Sans'] text-white">
@@ -287,7 +288,26 @@ const App: React.FC = () => {
                 <PhonePreview profile={profile} />
              </div>
 
-             <div className="w-[320px] space-y-6">
+             <div className="w-[320px] space-y-6 flex flex-col">
+               {/* QR CODE - Au-dessus de la card de lien */}
+               <div className="bg-white/5 backdrop-blur-3xl p-6 rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col items-center gap-4 group">
+                  <div className="w-full flex justify-between items-center mb-1">
+                    <span className="text-[9px] font-black text-purple-400 uppercase tracking-[0.3em]">Scanner Profil</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></div>
+                  </div>
+                  <div className="w-44 h-44 bg-[#120526] p-4 rounded-2xl border border-white/5 shadow-inner overflow-hidden group-hover:scale-105 transition-transform duration-500">
+                    <img 
+                      src={qrCodeUrl} 
+                      alt="QR Code Profil" 
+                      className="w-full h-full object-contain filter brightness-110"
+                    />
+                  </div>
+                  <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest text-center leading-relaxed">
+                    Téléchargez ou partagez <br/>votre QR direct
+                  </p>
+               </div>
+
+               {/* Panneau de Lien */}
                <div className="bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-white/10 shadow-2xl">
                   <div className="mb-6">
                     <span className="text-[9px] font-black text-purple-400 uppercase tracking-[0.3em] block mb-2">Lien de profil</span>
