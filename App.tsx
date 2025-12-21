@@ -171,7 +171,7 @@ const App: React.FC = () => {
     });
   };
 
-  // LOGIQUE DE SECURITE : Amina (digitalhight2025@gmail.com) est TOUJOURS admin
+  // LOGIQUE DE SECURITE PERMANENTE : Amina (digitalhight2025@gmail.com) est TOUJOURS admin
   const isAdmin = profile.is_admin || userAuthEmail === 'digitalhight2025@gmail.com';
 
   if (loading) {
@@ -207,7 +207,6 @@ const App: React.FC = () => {
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#0A0118] font-['Plus_Jakarta_Sans'] text-white">
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={(id) => { setUserId(id); fetchProfile(id); }} />
       
-      {/* Header avec bouton Super Admin protégé */}
       <header className="h-16 lg:h-20 border-b border-white/5 bg-[#0A0118]/80 backdrop-blur-3xl flex items-center px-4 lg:px-8 justify-between flex-shrink-0 z-20">
         <div className="flex items-center gap-2 lg:gap-3">
           <div className="w-8 h-8 lg:w-9 lg:h-9 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg font-['Bricolage_Grotesque']">W</div>
@@ -215,7 +214,7 @@ const App: React.FC = () => {
         </div>
         
         <div className="flex gap-2 lg:gap-6 items-center">
-          {/* LE BOUTON SUPER ADMIN - PROTECTION MAXIMALE */}
+          {/* LE BOUTON SUPER ADMIN - PROTECTION PERMANENTE */}
           {isAdmin && (
             <button 
               onClick={() => {
@@ -241,7 +240,6 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 flex overflow-hidden">
-        {/* Sidebar Editor */}
         <div className="w-full lg:w-[450px] bg-[#120526]/40 border-r border-white/5 flex flex-col flex-shrink-0 overflow-hidden backdrop-blur-3xl">
           <div className="px-6 lg:px-10 pt-6 lg:pt-8 pb-4 border-b border-white/5 flex gap-8 lg:gap-12 overflow-x-auto scrollbar-hide">
             <button onClick={() => setActiveEditorTab('profile')} className={`pb-4 text-[9px] lg:text-[10px] font-black uppercase tracking-[0.2em] relative transition-all ${activeEditorTab === 'profile' ? 'text-white' : 'text-gray-500'}`}>
@@ -269,17 +267,14 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Preview Container avec Panneau de Lien en Parallèle */}
         <div className="hidden lg:flex flex-1 bg-[#05010D] items-center justify-center relative overflow-hidden px-10">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[160px]"></div>
           
           <div className="relative z-10 flex items-center gap-12 xl:gap-20 animate-in zoom-in duration-1000">
-             {/* GSM Preview */}
              <div className="scale-[0.8] xl:scale-[0.85] drop-shadow-[0_60px_100px_rgba(0,0,0,0.8)] border-[14px] border-[#120526] rounded-[5rem] bg-black overflow-hidden shadow-2xl ring-1 ring-white/10">
                 <PhonePreview profile={profile} />
              </div>
 
-             {/* Link Panel - En parallèle du GSM */}
              <div className="w-[320px] space-y-6">
                <div className="bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-white/10 shadow-2xl">
                   <div className="mb-6">

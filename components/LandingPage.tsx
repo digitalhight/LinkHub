@@ -58,17 +58,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
     }
   };
 
-  const faqs = [
-    {
-      question: "Qu’est-ce qu’une vCard et pourquoi est-elle essentielle aujourd’hui ?",
-      answer: "Une vCard est une carte de visite numérique interactive qui centralise toutes vos informations professionnelles : photo, description, liens, réseaux sociaux, boutique, portfolio, QR code, etc."
-    },
-    {
-      question: "En quoi une vCard est-elle meilleure qu’un simple profil LinkedIn ?",
-      answer: "Une vCard vous appartient à 100 % : vous contrôlez l’apparence, les données, et l’expérience de vos visiteurs sans dépendre d'un algorithme tiers."
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-[#0A0118] text-white selection:bg-purple-500/30 overflow-x-hidden font-['Plus_Jakarta_Sans']">
       {/* Background VFX */}
@@ -77,26 +66,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         <div className="absolute bottom-[-20%] right-[-10%] w-[80%] h-[80%] bg-blue-600/10 rounded-full blur-[180px]"></div>
       </div>
 
-      {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-[#0A0118]/60 backdrop-blur-2xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_30px_rgba(168,85,247,0.3)] font-['Bricolage_Grotesque']">W</div>
             <span className="font-black text-2xl tracking-tighter">WomenCards<span className="text-purple-500">.</span></span>
           </div>
-          <button 
-            onClick={onGetStarted}
-            className="bg-white text-[#0A0118] px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl border border-white"
-          >
-            Démarrer
-          </button>
+          <button onClick={onGetStarted} className="bg-white text-[#0A0118] px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl border border-white">Démarrer</button>
         </div>
       </nav>
 
-      {/* Hero Section */}
       <section className="relative pt-40 lg:pt-48 pb-20 px-6 lg:px-20 min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-          
           <div className="text-left z-10 animate-in fade-in slide-in-from-left-10 duration-1000">
             <h1 className="text-4xl lg:text-6xl font-extrabold leading-[1.1] tracking-tighter mb-6 uppercase font-['Bricolage_Grotesque']">
               Un Clic. <br />
@@ -129,11 +110,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                     </button>
                   </div>
                   
-                  {/* Availability Badge */}
                   <div className="mt-4 ml-6 flex items-center gap-3">
-                    {availability === 'checking' && (
-                      <span className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Vérification...</span>
-                    )}
+                    {availability === 'checking' && <span className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Vérification...</span>}
                     {availability === 'available' && (
                       <div className="flex items-center gap-2 animate-in fade-in zoom-in">
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -150,21 +128,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                </div>
             </div>
             
-            <button 
-              onClick={onGetStarted}
-              className="px-10 py-5 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:shadow-[0_0_50px_rgba(147,51,234,0.3)] transition-all flex items-center gap-3"
-            >
-              Créer mon lien
+            <button onClick={onGetStarted} className="px-10 py-5 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:shadow-[0_0_50px_rgba(147,51,234,0.3)] transition-all flex items-center gap-3">
+              Démarrer gratuitement
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>
 
           <div className="relative hidden lg:block animate-in fade-in slide-in-from-right-10 duration-1000 delay-200">
-            <div 
-              className="relative w-[360px] h-[500px] mx-auto bg-gradient-to-br from-[#1E0B3B] to-[#0A0118] border border-white/10 rounded-[4rem] shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden"
-            >
+            <div className="relative w-[360px] h-[500px] mx-auto bg-gradient-to-br from-[#1E0B3B] to-[#0A0118] border border-white/10 rounded-[4rem] shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-full p-10 flex flex-col items-center">
-                <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full border-4 border-white/10 mb-8 overflow-hidden">
+                <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full border-4 border-white/10 mb-8 overflow-hidden shadow-2xl">
                   <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" alt="Avatar" className="w-full h-full object-cover" />
                 </div>
                 <div className="h-4 w-3/4 bg-white/10 rounded-full mb-3"></div>
@@ -180,7 +153,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-20 border-t border-white/5 text-center">
         <div className="flex items-center justify-center gap-3 mb-6">
            <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center text-white text-sm font-black">W</div>
