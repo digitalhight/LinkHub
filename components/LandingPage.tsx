@@ -32,69 +32,103 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </nav>
 
-      {/* Hero Content */}
-      <section className="relative pt-48 pb-32 px-6">
-        <div className="max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 mb-12 backdrop-blur-md animate-in fade-in slide-in-from-top-6 duration-1000">
-            <span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse shadow-[0_0_10px_#A855F7]"></span>
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-purple-200">Intelligence Artificielle Native</span>
-          </div>
+      {/* Hero Section */}
+      <section className="relative pt-48 pb-32 px-6 lg:px-20 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-20 items-center">
           
-          <h1 className="text-5xl lg:text-[7rem] font-extrabold leading-[0.85] tracking-tighter mb-12 uppercase animate-in fade-in slide-in-from-bottom-10 duration-700">
-            Un Clic. Une Femme. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">Une Légende.</span>
-          </h1>
-          
-          <p className="text-lg lg:text-xl text-gray-400 mb-16 leading-relaxed max-w-3xl mx-auto font-medium">
-            Pour les femmes professionnelles actives sur plusieurs plateformes et qui veulent unifier leur présence en un seul lien.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-24">
-            <button 
-              onClick={onGetStarted}
-              className="w-full sm:w-auto px-14 py-6 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-3xl font-black text-lg hover:shadow-[0_0_50px_rgba(147,51,234,0.3)] transition-all active:scale-95 group flex items-center justify-center gap-3"
-            >
-              Commencer maintenant
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
-            <button className="w-full sm:w-auto px-14 py-6 bg-white/5 border border-white/10 rounded-3xl font-black text-lg hover:bg-white/10 transition-all backdrop-blur-sm">
-              Voir Démo
-            </button>
+          {/* Left Content */}
+          <div className="text-left z-10 animate-in fade-in slide-in-from-left-10 duration-1000">
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 mb-10 backdrop-blur-md">
+              <span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse shadow-[0_0_10px_#A855F7]"></span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-purple-200">Intelligence Artificielle Native</span>
+            </div>
+            
+            <h1 className="text-5xl lg:text-[6.5rem] font-extrabold leading-[0.9] tracking-tighter mb-10 uppercase">
+              Un Clic. <br />
+              Une Femme. <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">Une Légende.</span>
+            </h1>
+            
+            <p className="text-lg lg:text-xl text-gray-400 mb-14 leading-relaxed max-w-xl font-medium">
+              Pour les femmes professionnelles actives sur plusieurs plateformes et qui veulent unifier leur présence en un seul lien.
+            </p>
+            
+            <div className="flex items-center">
+              <button 
+                onClick={onGetStarted}
+                className="w-full sm:w-auto px-14 py-6 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-3xl font-black text-lg hover:shadow-[0_0_50px_rgba(147,51,234,0.3)] transition-all active:scale-95 group flex items-center justify-center gap-3"
+              >
+                Commencer maintenant
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
           </div>
 
-          {/* Futuristic Preview */}
-          <div className="relative max-w-4xl mx-auto animate-in zoom-in-95 duration-1000 delay-300">
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0118] via-transparent to-transparent z-10"></div>
-            <div className="bg-[#120526]/60 backdrop-blur-3xl border border-white/10 rounded-[3rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.6)]">
-              <div className="h-14 border-b border-white/5 flex items-center px-8 justify-between bg-white/5">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/40"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/40"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500/40"></div>
+          {/* Right Visual Content (VCard composition) */}
+          <div className="relative perspective-[2000px] hidden lg:block animate-in fade-in slide-in-from-right-10 duration-1000 delay-200">
+            {/* Ambient Background Glow for the Card */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+
+            {/* Engagement Metrics Bubbles */}
+            <div className="absolute -top-10 left-0 z-20 bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-3xl shadow-2xl animate-bounce" style={{ animationDuration: '4s' }}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center text-green-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
                 </div>
-                <div className="px-5 py-2 bg-white/5 rounded-full text-[10px] font-black text-gray-500 tracking-widest uppercase">womencards.ai/amina</div>
-              </div>
-              <div className="p-12 text-left">
-                <div className="grid lg:grid-cols-4 gap-12">
-                  <div className="space-y-8">
-                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500/30 to-blue-500/30 rounded-2xl border border-white/10 flex items-center justify-center text-purple-400">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-                    </div>
-                    <div className="h-4 w-full bg-white/5 rounded-full"></div>
-                    <div className="h-4 w-4/5 bg-white/5 rounded-full"></div>
-                    <div className="h-4 w-3/5 bg-white/5 rounded-full"></div>
-                  </div>
-                  <div className="lg:col-span-3">
-                    <div className="h-72 w-full bg-gradient-to-br from-purple-600/10 via-blue-600/5 to-transparent rounded-[2.5rem] border border-white/5 flex items-center justify-center relative overflow-hidden">
-                       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,#A855F7_0%,transparent_70%)] opacity-10"></div>
-                       <div className="text-center z-10">
-                         <div className="text-5xl font-black text-white mb-2 tracking-tighter">98.5%</div>
-                         <div className="text-[11px] font-black text-purple-400 uppercase tracking-[0.3em]">Indice de Confiance AI</div>
-                       </div>
-                    </div>
-                  </div>
+                <div>
+                  <div className="text-xs font-black text-gray-500 uppercase tracking-widest">Analytics</div>
+                  <div className="text-xl font-black text-white">+248%</div>
                 </div>
               </div>
+            </div>
+
+            <div className="absolute bottom-10 -right-5 z-20 bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-3xl shadow-2xl animate-pulse">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                </div>
+                <div>
+                  <div className="text-xs font-black text-gray-500 uppercase tracking-widest">Sécurité</div>
+                  <div className="text-sm font-black text-white">Certifié AI</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tilted VCard Model */}
+            <div 
+              className="relative w-[400px] h-[550px] mx-auto bg-gradient-to-br from-[#1E0B3B] to-[#0A0118] border border-white/10 rounded-[4rem] shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden transform rotate-y-[-25deg] rotate-x-[15deg] rotate-z-[-5deg] hover:rotate-y-[-10deg] transition-transform duration-700"
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              {/* Card Inner Content (Mockup) */}
+              <div className="absolute top-0 left-0 w-full h-full p-10 flex flex-col items-center">
+                <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full border-4 border-white/10 mb-8 overflow-hidden">
+                  <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" alt="Avatar" className="w-full h-full object-cover" />
+                </div>
+                <div className="h-4 w-3/4 bg-white/10 rounded-full mb-3"></div>
+                <div className="h-3 w-1/2 bg-white/5 rounded-full mb-12"></div>
+                
+                <div className="w-full space-y-4">
+                  <div className="h-14 w-full bg-white/5 rounded-2xl border border-white/5 flex items-center px-6">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mr-4"></div>
+                    <div className="h-3 w-2/3 bg-white/10 rounded-full"></div>
+                  </div>
+                  <div className="h-14 w-full bg-white/5 rounded-2xl border border-white/5 flex items-center px-6">
+                    <div className="w-2 h-2 bg-pink-500 rounded-full mr-4"></div>
+                    <div className="h-3 w-1/2 bg-white/10 rounded-full"></div>
+                  </div>
+                  <div className="h-14 w-full bg-white/5 rounded-2xl border border-white/5 flex items-center px-6">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-4"></div>
+                    <div className="h-3 w-3/4 bg-white/10 rounded-full"></div>
+                  </div>
+                </div>
+
+                <div className="mt-auto opacity-20">
+                  <div className="text-[8px] font-black uppercase tracking-[0.5em] text-white">WomenCards Engine</div>
+                </div>
+              </div>
+
+              {/* Shine Effect */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none"></div>
             </div>
           </div>
         </div>
