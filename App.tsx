@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UserProfile, EditorTab } from './types';
+import { UserProfile, EditorTab, LinkItem } from './types';
 import { INITIAL_PROFILE } from './constants';
 import PhonePreview from './components/PhonePreview';
 import { ProfileSection, LinksSection, ThemeSection } from './components/EditorSections';
@@ -7,7 +7,7 @@ import PublicProfile from './components/PublicProfile';
 import LandingPage from './components/LandingPage';
 import AdminDashboard from './components/AdminDashboard';
 import { AuthModal } from './components/AuthModal';
-import { supabase, isSupabaseConfigured } from './utils/supabaseClient';
+import { supabase } from './utils/supabaseClient';
 
 const App: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile>(INITIAL_PROFILE);
@@ -21,11 +21,12 @@ const App: React.FC = () => {
   
   const [isPublicView, setIsPublicView] = useState(false);
   const [isAdminView, setIsAdminView] = useState(false);
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); 
   const [publicUsername, setPublicUsername] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
-  const [dbError, setDbError] = useState<string | null>(null);
   const [copyFeedback, setCopyFeedback] = useState(false);
+
+  // État pour le QR Code sélectionné dans le panneau de droite
+  const [selectedQrLink, setSelectedQrLink] = useState<{title: string, url: string} | null>(null);
 
   useEffect(() => {
     const checkRouting = () => {
@@ -68,14 +69,13 @@ const App: React.FC = () => {
       setLoading(true);
       try {
         const { data: { session } } = await supabase.auth.getSession();
-
         if (session) {
           setUserId(session.user.id);
           setUserAuthEmail(session.user.email || '');
           await fetchProfile(session.user.id);
         }
       } catch (err: any) {
-        setDbError("La base de données est actuellement indisponible.");
+        console.error("Erreur d'initialisation", err);
       } finally {
         setLoading(false);
       }
@@ -98,6 +98,7 @@ const App: React.FC = () => {
         setNotFound(true);
       } else {
         setProfile({
+          id: data.id,
           name: data.name || username,
           username: data.username,
           bio: data.bio || '',
@@ -163,22 +164,20 @@ const App: React.FC = () => {
     }
   };
 
-  const copyToClipboard = () => {
-    const url = `https://www.women.cards/${profile.username}`;
-    navigator.clipboard.writeText(url).then(() => {
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
       setCopyFeedback(true);
       setTimeout(() => setCopyFeedback(false), 2000);
     });
   };
 
-  // LOGIQUE DE SECURITE PERMANENTE : Amina (digitalhight2025@gmail.com) est TOUJOURS admin
   const isAdmin = profile.is_admin || userAuthEmail === 'digitalhight2025@gmail.com';
 
   if (loading) {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#0A0118] z-[9999]">
         <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white font-black text-3xl animate-pulse font-['Bricolage_Grotesque']">W</div>
-        <p className="mt-8 text-[10px] font-black uppercase tracking-[0.6em] animate-pulse">Chargement...</p>
+        <p className="mt-8 text-[10px] font-black uppercase tracking-[0.6em] animate-pulse text-purple-400">Synchronisation...</p>
       </div>
     );
   }
@@ -201,8 +200,9 @@ const App: React.FC = () => {
     );
   }
 
-  const fullProfileUrl = `https://www.women.cards/${profile.username}`;
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(fullProfileUrl)}&bgcolor=120526&color=ffffff&margin=10`;
+  const profileUrl = `${window.location.origin}/${profile.username}`;
+  const currentQrTarget = selectedQrLink || { title: "Profil Principal", url: profileUrl };
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(currentQrTarget.url)}&bgcolor=120526&color=ffffff&margin=10`;
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#0A0118] font-['Plus_Jakarta_Sans'] text-white">
@@ -211,41 +211,34 @@ const App: React.FC = () => {
       <header className="h-16 lg:h-20 border-b border-white/5 bg-[#0A0118]/80 backdrop-blur-3xl flex items-center px-4 lg:px-8 justify-between flex-shrink-0 z-20">
         <div className="flex items-center gap-2 lg:gap-3">
           <div className="w-8 h-8 lg:w-9 lg:h-9 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg font-['Bricolage_Grotesque']">W</div>
-          <div className="flex flex-col xs:flex-row items-baseline gap-1 xs:gap-2">
-            <h1 className="font-black text-sm lg:text-lg tracking-tighter hidden xs:block">WomenCards<span className="text-purple-500">.</span></h1>
-            
-            {/* Lien du profil direct dans le header */}
+          <div className="flex items-center gap-3">
+            <h1 className="font-black text-sm lg:text-lg tracking-tighter hidden sm:block">WomenCards<span className="text-purple-500">.</span></h1>
             <a 
               href={`/${profile.username}`} 
               target="_blank" 
-              className="hidden md:flex items-center gap-2 ml-4 px-3 py-1 bg-white/5 border border-white/5 rounded-full hover:bg-white/10 transition-all group"
+              className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/5 rounded-full hover:bg-white/10 transition-all group"
             >
-              <div className="w-1 h-1 rounded-full bg-purple-500 group-hover:animate-pulse"></div>
+              <div className="w-1.5 h-1.5 rounded-full bg-purple-500 group-hover:animate-pulse"></div>
               <span className="text-[9px] font-black text-gray-500 group-hover:text-purple-400 uppercase tracking-widest transition-colors">women.cards/{profile.username}</span>
             </a>
           </div>
         </div>
         
         <div className="flex gap-2 lg:gap-6 items-center">
-          {/* LE BOUTON SUPER ADMIN - PROTECTION PERMANENTE */}
           {isAdmin && (
             <button 
-              onClick={() => {
-                setIsAdminView(true);
-                window.history.pushState({}, '', '/admin');
-              }}
+              onClick={() => { setIsAdminView(true); window.history.pushState({}, '', '/admin'); }}
               className="flex items-center gap-2 px-3 lg:px-4 py-1.5 lg:py-2 bg-amber-500/10 border border-amber-500/20 rounded-full hover:bg-amber-500/20 transition-all group mr-2"
             >
               <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-amber-500 rounded-full animate-pulse"></div>
-              <span className="text-[8px] lg:text-[10px] font-black text-amber-500 uppercase tracking-widest">Super Admin</span>
+              <span className="text-[8px] lg:text-[10px] font-black text-amber-500 uppercase tracking-widest text-nowrap">Admin</span>
             </button>
           )}
-
           <button onClick={() => { supabase.auth.signOut().then(() => { setUserId(''); window.location.href = '/'; }); }} className="text-[9px] lg:text-[10px] font-black text-gray-500 hover:text-white uppercase tracking-widest hidden sm:block">Déconnexion</button>
           <button 
             onClick={handleSave} 
             disabled={saving} 
-            className={`text-[9px] lg:text-[11px] font-black px-4 lg:px-10 py-2 lg:py-2.5 rounded-full transition-all shadow-xl ${saveSuccess ? 'bg-green-500 text-white' : 'bg-white text-[#0A0118] hover:scale-105 active:scale-95 disabled:opacity-50 border border-white'}`}
+            className={`text-[9px] lg:text-[11px] font-black px-4 lg:px-10 py-2 lg:py-2.5 rounded-full transition-all shadow-xl ${saveSuccess ? 'bg-green-500 text-white shadow-green-500/20' : 'bg-white text-[#0A0118] hover:scale-105 active:scale-95 disabled:opacity-50 border border-white'}`}
           >
             {saving ? 'SYNC...' : saveSuccess ? 'PUBLIÉ' : 'PUBLIER'}
           </button>
@@ -253,99 +246,108 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 flex overflow-hidden">
+        {/* Panneau de gauche - Éditeur */}
         <div className="w-full lg:w-[450px] bg-[#120526]/40 border-r border-white/5 flex flex-col flex-shrink-0 overflow-hidden backdrop-blur-3xl">
           <div className="px-6 lg:px-10 pt-6 lg:pt-8 pb-4 border-b border-white/5 flex gap-8 lg:gap-12 overflow-x-auto scrollbar-hide">
-            <button onClick={() => setActiveEditorTab('profile')} className={`pb-4 text-[9px] lg:text-[10px] font-black uppercase tracking-[0.2em] relative transition-all ${activeEditorTab === 'profile' ? 'text-white' : 'text-gray-500'}`}>
-              PROFIL
-              {activeEditorTab === 'profile' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500 rounded-full"></div>}
-            </button>
-            <button onClick={() => setActiveEditorTab('links')} className={`pb-4 text-[9px] lg:text-[10px] font-black uppercase tracking-[0.2em] relative transition-all ${activeEditorTab === 'links' ? 'text-white' : 'text-gray-500'}`}>
-              LIENS
-              {activeEditorTab === 'links' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500 rounded-full"></div>}
-            </button>
-            <button onClick={() => setActiveEditorTab('theme')} className={`pb-4 text-[9px] lg:text-[10px] font-black uppercase tracking-[0.2em] relative transition-all ${activeEditorTab === 'theme' ? 'text-white' : 'text-gray-500'}`}>
-              THÈME
-              {activeEditorTab === 'theme' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500 rounded-full"></div>}
-            </button>
+            {['profile', 'links', 'theme'].map((tab) => (
+              <button 
+                key={tab}
+                onClick={() => setActiveEditorTab(tab as any)} 
+                className={`pb-4 text-[9px] lg:text-[10px] font-black uppercase tracking-[0.2em] relative transition-all ${activeEditorTab === tab ? 'text-white' : 'text-gray-500'}`}
+              >
+                {tab === 'profile' ? 'PROFIL' : tab === 'links' ? 'LIENS' : 'STYLE'}
+                {activeEditorTab === tab && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.5)]"></div>}
+              </button>
+            ))}
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 lg:p-10 scrollbar-hide">
-            {activeEditorTab === 'profile' ? (
-              <ProfileSection profile={profile} setProfile={setProfile} />
-            ) : activeEditorTab === 'links' ? (
-              <LinksSection profile={profile} setProfile={setProfile} />
-            ) : (
-              <ThemeSection profile={profile} setProfile={setProfile} />
-            )}
+            {activeEditorTab === 'profile' ? <ProfileSection profile={profile} setProfile={setProfile} /> :
+             activeEditorTab === 'links' ? <LinksSection profile={profile} setProfile={setProfile} /> :
+             <ThemeSection profile={profile} setProfile={setProfile} />}
           </div>
         </div>
 
+        {/* Panneau central - Preview Mobile */}
         <div className="hidden lg:flex flex-1 bg-[#05010D] items-center justify-center relative overflow-hidden px-10">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[160px]"></div>
-          
-          <div className="relative z-10 flex items-center gap-12 xl:gap-20 animate-in zoom-in duration-1000">
+          <div className="relative z-10 animate-in zoom-in duration-1000">
              <div className="scale-[0.8] xl:scale-[0.85] drop-shadow-[0_60px_100px_rgba(0,0,0,0.8)] border-[14px] border-[#120526] rounded-[5rem] bg-black overflow-hidden shadow-2xl ring-1 ring-white/10">
                 <PhonePreview profile={profile} />
              </div>
-
-             <div className="w-[320px] space-y-6 flex flex-col">
-               {/* QR CODE - Au-dessus de la card de lien */}
-               <div className="bg-white/5 backdrop-blur-3xl p-6 rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col items-center gap-4 group">
-                  <div className="w-full flex justify-between items-center mb-1">
-                    <span className="text-[9px] font-black text-purple-400 uppercase tracking-[0.3em]">Scanner Profil</span>
-                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></div>
-                  </div>
-                  <div className="w-44 h-44 bg-[#120526] p-4 rounded-2xl border border-white/5 shadow-inner overflow-hidden group-hover:scale-105 transition-transform duration-500">
-                    <img 
-                      src={qrCodeUrl} 
-                      alt="QR Code Profil" 
-                      className="w-full h-full object-contain filter brightness-110"
-                    />
-                  </div>
-                  <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest text-center leading-relaxed">
-                    Téléchargez ou partagez <br/>votre QR direct
-                  </p>
-               </div>
-
-               {/* Panneau de Lien */}
-               <div className="bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-white/10 shadow-2xl">
-                  <div className="mb-6">
-                    <span className="text-[9px] font-black text-purple-400 uppercase tracking-[0.3em] block mb-2">Lien de profil</span>
-                    <h3 className="text-lg font-black tracking-tighter text-white truncate">women.cards/{profile.username}</h3>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <button 
-                      onClick={copyToClipboard}
-                      className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all gap-2 ${copyFeedback ? 'bg-green-500/20 border-green-500/40' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-                        {copyFeedback ? '✓' : '❐'}
-                      </div>
-                      <span className="text-[9px] font-black uppercase tracking-widest">{copyFeedback ? 'COPIÉ' : 'COPIER'}</span>
-                    </button>
-
-                    <button 
-                      onClick={() => window.open(fullProfileUrl, '_blank')}
-                      className="flex flex-col items-center justify-center p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all gap-2"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">↗</div>
-                      <span className="text-[9px] font-black uppercase tracking-widest text-white/60">OUVRIR</span>
-                    </button>
-                  </div>
-
-                  <div className="mt-8 pt-8 border-t border-white/5">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                      <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Page en ligne</span>
-                    </div>
-                    <p className="text-[10px] text-gray-500 leading-relaxed font-medium">
-                      Votre page est accessible publiquement. Partagez ce lien sur vos réseaux sociaux.
-                    </p>
-                  </div>
-               </div>
-             </div>
           </div>
+        </div>
+
+        {/* Panneau de droite - QR Hub */}
+        <div className="hidden xl:flex w-[380px] bg-[#0A0118] border-l border-white/5 flex-col p-8 gap-6 z-10">
+           <div className="space-y-6">
+              <div className="bg-white/5 backdrop-blur-3xl p-6 rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col items-center gap-5 transition-all">
+                <div className="w-full flex justify-between items-center">
+                  <span className="text-[9px] font-black text-purple-400 uppercase tracking-[0.3em]">Générateur QR</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.8)]"></div>
+                </div>
+
+                <div className="w-48 h-48 bg-[#120526] p-5 rounded-[2rem] border border-white/5 shadow-inner overflow-hidden flex items-center justify-center">
+                  <img src={qrCodeUrl} alt="QR Code" className="w-full h-full object-contain filter brightness-110" />
+                </div>
+
+                <div className="text-center space-y-1">
+                  <h4 className="text-[11px] font-black text-white uppercase tracking-widest truncate max-w-full">{currentQrTarget.title}</h4>
+                  <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest truncate max-w-full opacity-60">women.cards/{profile.username}{selectedQrLink ? `/${selectedQrLink.title.toLowerCase().substring(0,8)}` : ''}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 w-full">
+                  <button onClick={() => copyToClipboard(currentQrTarget.url)} className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all ${copyFeedback ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'}`}>
+                    {copyFeedback ? 'Copié' : 'Lien'}
+                  </button>
+                  <button onClick={() => window.open(qrCodeUrl, '_blank')} className="flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">
+                    Agrandir
+                  </button>
+                </div>
+              </div>
+
+              {/* Liste des QR alternatifs */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between px-2">
+                   <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Sélecteur d'URL</h3>
+                   <span className="text-[9px] font-bold text-purple-500/50">{profile.links.filter(l => l.isActive).length + 1} disponibles</span>
+                </div>
+
+                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
+                  <button 
+                    onClick={() => setSelectedQrLink(null)}
+                    className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left ${selectedQrLink === null ? 'bg-purple-600/10 border-purple-500/30' : 'bg-white/5 border-white/5 hover:bg-white/[0.08]'}`}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-xs">P</div>
+                    <div className="flex-1 overflow-hidden">
+                      <p className="text-[10px] font-black uppercase tracking-tight text-white truncate">Profil Principal</p>
+                      <p className="text-[8px] font-bold text-gray-500 truncate">Bio, Liens, Contact</p>
+                    </div>
+                  </button>
+
+                  {profile.links.filter(l => l.isActive).map((link) => (
+                    <button 
+                      key={link.id}
+                      onClick={() => setSelectedQrLink({ title: link.title, url: link.url })}
+                      className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left ${selectedQrLink?.url === link.url ? 'bg-purple-600/10 border-purple-500/30' : 'bg-white/5 border-white/5 hover:bg-white/[0.08]'}`}
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-gray-400 font-bold text-[10px]">🔗</div>
+                      <div className="flex-1 overflow-hidden">
+                        <p className="text-[10px] font-black uppercase tracking-tight text-white truncate">{link.title}</p>
+                        <p className="text-[8px] font-bold text-gray-500 truncate">{link.url}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+           </div>
+
+           <div className="mt-auto bg-gradient-to-br from-purple-600/10 to-transparent p-6 rounded-3xl border border-white/5">
+              <p className="text-[10px] font-black text-purple-400 uppercase tracking-[0.2em] mb-2">Conseil Marketing</p>
+              <p className="text-[10px] text-gray-500 leading-relaxed font-medium">
+                Utilisez les QR codes individuels sur vos supports physiques pour diriger vos clients vers une offre spécifique.
+              </p>
+           </div>
         </div>
       </main>
     </div>
