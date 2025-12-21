@@ -23,7 +23,7 @@ const PublicProfile: React.FC<PublicProfileProps> = ({ profile, notFound }) => {
         </div>
         <h1 className="text-2xl font-black mb-2 uppercase tracking-tighter">Profil Introuvable</h1>
         <p className="text-sm text-gray-500 mb-8 text-center max-w-xs font-medium">Ce lien ne correspond à aucun compte WomenCards actif.</p>
-        <a href="/" className="px-8 py-4 bg-white text-black font-black rounded-2xl shadow-xl hover:scale-105 transition-all active:scale-95 text-sm uppercase tracking-widest">Créer mon profil</a>
+        <a href="https://www.women.cards" className="px-8 py-4 bg-white text-black font-black rounded-2xl shadow-xl hover:scale-105 transition-all active:scale-95 text-sm uppercase tracking-widest">Créer mon profil</a>
       </div>
     );
   }
@@ -112,7 +112,7 @@ const PublicProfile: React.FC<PublicProfileProps> = ({ profile, notFound }) => {
 
         {/* Branding Footer */}
         <div className="mt-auto">
-          <a href="/" className="flex flex-col items-center gap-2 group">
+          <a href="https://www.women.cards" className="flex flex-col items-center gap-2 group">
             <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 group-hover:opacity-100 transition-opacity">Créé avec</span>
             <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/10 opacity-40 group-hover:opacity-100 transition-all">
                <div className="w-5 h-5 bg-[#A855F7] rounded-md flex items-center justify-center text-white font-black text-[10px]">W</div>
