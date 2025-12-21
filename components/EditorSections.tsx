@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { UserProfile, LinkItem, ThemeConfig } from '../types';
 import { DEFAULT_THEMES } from '../constants';
-import { generateTheme } from '../utils/ai';
 import { supabase } from '../utils/supabaseClient';
 
 const Icons = {
@@ -171,48 +170,8 @@ export const LinksSection: React.FC<{ profile: UserProfile, setProfile: (p: User
 
 // Section THEME
 export const ThemeSection: React.FC<{ profile: UserProfile, setProfile: (p: UserProfile) => void }> = ({ profile, setProfile }) => {
-  const [prompt, setPrompt] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const handleMagic = async () => {
-    if (!prompt) return;
-    setIsGenerating(true);
-    try {
-      const colors = await generateTheme(prompt);
-      setProfile({ ...profile, theme: { ...profile.theme, ...colors, name: 'Thème IA', id: `ai-${Date.now()}` } });
-    } catch (e) {
-      alert("IA occupée, réessayez !");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-      <div className="bg-gradient-to-br from-[#3D5AFE] to-blue-700 rounded-[2rem] p-6 text-white shadow-2xl shadow-blue-100 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-x-10 -translate-y-10 blur-2xl"></div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="p-2 bg-white/20 rounded-xl"><Icons.Wand /></div>
-            <h3 className="text-xs font-black uppercase tracking-widest">Générateur IA</h3>
-          </div>
-          <p className="text-[10px] text-blue-100 font-bold mb-4 leading-relaxed">Décrivez l'ambiance souhaitée (ex: "Pastel et doux", "Neon Cyberpunk") :</p>
-          <div className="flex gap-2">
-            <input 
-              type="text" 
-              value={prompt} 
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Vibe..." 
-              className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-xs font-bold placeholder:text-blue-200 outline-none focus:bg-white/20"
-              onKeyDown={(e) => e.key === 'Enter' && handleMagic()}
-            />
-            <button onClick={handleMagic} disabled={isGenerating || !prompt} className="bg-white text-[#3D5AFE] px-4 py-2 rounded-xl text-xs font-black hover:bg-gray-100 transition-all disabled:opacity-50">
-              {isGenerating ? '...' : 'OK'}
-            </button>
-          </div>
-        </div>
-      </div>
-
       <div className="space-y-4">
         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Préréglages</label>
         <div className="grid grid-cols-2 gap-3">
