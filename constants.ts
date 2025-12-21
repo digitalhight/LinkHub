@@ -54,16 +54,16 @@ export const DEFAULT_THEMES: ThemeConfig[] = [
 ];
 
 export const INITIAL_PROFILE: UserProfile = {
-  name: 'Alex Developer',
-  username: 'alexdev',
-  bio: 'Building the future with React & AI. 🚀',
-  avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1760&q=80',
+  name: 'Sophie Martin',
+  username: 'sophie',
+  bio: 'Créatrice de contenus & Passionnée de design. ✨\nBienvenue sur mon univers numérique !',
+  avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
   phone: '',
   email: '',
   links: [
-    { id: '1', title: 'My Portfolio', url: 'https://example.com', isActive: true },
-    { id: '2', title: 'GitHub', url: 'https://github.com', isActive: true },
-    { id: '3', title: 'Twitter / X', url: 'https://twitter.com', isActive: true },
+    { id: '1', title: 'Mon Portfolio', url: 'https://example.com', isActive: true },
+    { id: '2', title: 'Instagram', url: 'https://instagram.com', isActive: true },
+    { id: '3', title: 'Ma Boutique', url: 'https://example.com/shop', isActive: true },
     { id: '4', title: 'LinkedIn', url: 'https://linkedin.com', isActive: false },
   ],
   theme: DEFAULT_THEMES[0],
