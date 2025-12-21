@@ -33,16 +33,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-48 pb-32 px-6 lg:px-20 min-h-screen flex items-center">
+      <section className="relative pt-48 pb-20 px-6 lg:px-20 min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-20 items-center">
           
           {/* Left Content */}
           <div className="text-left z-10 animate-in fade-in slide-in-from-left-10 duration-1000">
-            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 mb-10 backdrop-blur-md">
-              <span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse shadow-[0_0_10px_#A855F7]"></span>
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-purple-200">Intelligence Artificielle Native</span>
-            </div>
-            
             <h1 className="text-5xl lg:text-[6.5rem] font-extrabold leading-[0.9] tracking-tighter mb-10 uppercase">
               Un Clic. <br />
               Une Femme. <br />
@@ -78,18 +73,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 <div>
                   <div className="text-xs font-black text-gray-500 uppercase tracking-widest">Analytics</div>
                   <div className="text-xl font-black text-white">+248%</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute bottom-10 -right-5 z-20 bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-3xl shadow-2xl animate-pulse">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-                </div>
-                <div>
-                  <div className="text-xs font-black text-gray-500 uppercase tracking-widest">Sécurité</div>
-                  <div className="text-sm font-black text-white">Certifié AI</div>
                 </div>
               </div>
             </div>
@@ -130,6 +113,38 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               {/* Shine Effect */}
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none"></div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Feature Cards Section */}
+      <section className="relative pb-32 px-6 lg:px-20 z-10">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
+          {/* Card 1 */}
+          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] hover:bg-white/10 transition-all group relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl"></div>
+            <h3 className="text-xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-purple-400 transition-colors">Créez votre vCard digitale</h3>
+            <p className="text-gray-400 leading-relaxed font-medium">
+              Chaque femme a une histoire à raconter, une expertise à partager, un projet à valoriser.
+            </p>
+          </div>
+
+          {/* Card 2 */}
+          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] hover:bg-white/10 transition-all group relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl"></div>
+            <h3 className="text-xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-blue-400 transition-colors">Pourquoi?</h3>
+            <p className="text-gray-400 leading-relaxed font-medium">
+              Remplacez votre carte papier par une <span className="text-white font-bold">vCard digitale interactive</span> : plus moderne, plus durable, plus efficace.
+            </p>
+          </div>
+
+          {/* Card 3 */}
+          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] hover:bg-white/10 transition-all group relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl"></div>
+            <h3 className="text-xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-pink-400 transition-colors">Quelle cible</h3>
+            <p className="text-gray-400 leading-relaxed font-medium">
+              Idéale pour les événements, réseaux sociaux, signatures d’email ou pitch rapide.
+            </p>
           </div>
         </div>
       </section>
