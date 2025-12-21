@@ -25,6 +25,7 @@ const App: React.FC = () => {
   const [publicUsername, setPublicUsername] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
+  const [copyFeedback, setCopyFeedback] = useState(false);
 
   useEffect(() => {
     const checkRouting = () => {
@@ -163,6 +164,14 @@ const App: React.FC = () => {
     }
   };
 
+  const copyToClipboard = () => {
+    const url = `https://www.women.cards/${profile.username}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 2000);
+    });
+  };
+
   const isAdmin = profile.is_admin || userAuthEmail === 'digitalhight2025@gmail.com';
 
   if (loading) {
@@ -211,7 +220,6 @@ const App: React.FC = () => {
         </div>
         
         <div className="flex gap-2 lg:gap-6 items-center">
-          {/* BOUTON SUPER ADMIN - Visible uniquement pour Amina/Admin */}
           {isAdmin && (
             <button 
               onClick={() => {
@@ -279,23 +287,73 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Preview Container */}
-        <div className="hidden lg:flex flex-1 bg-[#05010D] items-center justify-center relative overflow-hidden">
+        {/* Preview Container avec Panneau de Lien en Parallèle */}
+        <div className="hidden lg:flex flex-1 bg-[#05010D] items-center justify-center relative overflow-hidden px-10">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[160px]"></div>
-          <div className="relative z-10 flex flex-col items-center gap-8 animate-in zoom-in duration-1000">
-             <div className="scale-[0.85] xl:scale-[0.9] drop-shadow-[0_60px_100px_rgba(0,0,0,0.8)] border-[14px] border-[#120526] rounded-[5rem] bg-black overflow-hidden shadow-2xl ring-1 ring-white/10 transition-transform">
+          
+          <div className="relative z-10 flex items-center gap-12 xl:gap-20 animate-in zoom-in duration-1000">
+             {/* GSM Preview */}
+             <div className="scale-[0.8] xl:scale-[0.85] drop-shadow-[0_60px_100px_rgba(0,0,0,0.8)] border-[14px] border-[#120526] rounded-[5rem] bg-black overflow-hidden shadow-2xl ring-1 ring-white/10 transition-transform hover:scale-[0.87]">
                 <PhonePreview profile={profile} />
              </div>
-             <div className="w-full max-w-[320px]">
-               <button onClick={() => window.open(fullProfileUrl, '_blank')} className="w-full bg-white/5 backdrop-blur-3xl px-6 py-4 rounded-2xl border border-white/10 group hover:bg-white/10 transition-all flex items-center justify-between">
-                  <div className="flex flex-col items-start gap-1 overflow-hidden text-left">
-                    <span className="text-[9px] font-black text-purple-400 uppercase tracking-widest">Lien de profil :</span>
-                    <p className="text-[11px] font-bold text-white truncate max-w-full">women.cards/{profile.username}</p>
+
+             {/* Link Panel - En parallèle du GSM */}
+             <div className="w-[320px] space-y-6 animate-in slide-in-from-right-10 duration-700 delay-300">
+               <div className="bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-white/10 shadow-2xl">
+                  <div className="mb-6">
+                    <span className="text-[9px] font-black text-purple-400 uppercase tracking-[0.3em] block mb-2">Lien de profil</span>
+                    <h3 className="text-lg font-black tracking-tighter text-white truncate">women.cards/{profile.username}</h3>
                   </div>
-                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center group-hover:bg-purple-500 transition-colors">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <button 
+                      onClick={copyToClipboard}
+                      className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all gap-2 group ${copyFeedback ? 'bg-green-500/20 border-green-500/40' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
+                    >
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${copyFeedback ? 'bg-green-500 text-white' : 'bg-white/10 text-white group-hover:bg-purple-500'}`}>
+                        {copyFeedback ? (
+                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        ) : (
+                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        )}
+                      </div>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-white/60">{copyFeedback ? 'COPIÉ' : 'COPIER'}</span>
+                    </button>
+
+                    <button 
+                      onClick={() => window.open(fullProfileUrl, '_blank')}
+                      className="flex flex-col items-center justify-center p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all gap-2 group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center group-hover:bg-blue-500 transition-colors">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
+                      </div>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-white/60">OUVRIR</span>
+                    </button>
                   </div>
-               </button>
+
+                  <div className="mt-8 pt-8 border-t border-white/5">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                      <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Page en ligne</span>
+                    </div>
+                    <p className="text-[10px] text-gray-500 leading-relaxed font-medium">
+                      Votre page est accessible publiquement. Partagez ce lien sur vos réseaux sociaux (Instagram, TikTok, Bio) pour maximiser votre visibilité.
+                    </p>
+                  </div>
+               </div>
+
+               {/* Tips Card */}
+               <div className="bg-gradient-to-br from-purple-600/20 to-indigo-600/20 backdrop-blur-xl p-6 rounded-[2rem] border border-white/5">
+                  <div className="flex items-start gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-purple-500 flex items-center justify-center text-white flex-shrink-0 font-bold text-xs shadow-lg">?</div>
+                    <div>
+                      <h4 className="text-[10px] font-black text-white uppercase tracking-widest mb-1">Conseil d'Experte</h4>
+                      <p className="text-[10px] text-purple-200/60 leading-relaxed">
+                        Ajoutez des liens clairs et directs. Moins il y a de clics entre vous et votre cliente, plus vous convertissez.
+                      </p>
+                    </div>
+                  </div>
+               </div>
              </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../utils/supabaseClient';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -30,22 +31,45 @@ const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, ans
 };
 
 const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
+  const [searchUsername, setSearchUsername] = useState('');
+  const [availability, setAvailability] = useState<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle');
+
+  const checkUsername = async (val: string) => {
+    const username = val.toLowerCase().trim().replace(/[^a-z0-9_]/g, '');
+    setSearchUsername(username);
+    
+    if (username.length < 3) {
+      setAvailability('idle');
+      return;
+    }
+
+    setAvailability('checking');
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('username', username)
+        .maybeSingle();
+      
+      if (error) throw error;
+      setAvailability(data ? 'taken' : 'available');
+    } catch (err) {
+      setAvailability('idle');
+    }
+  };
+
   const faqs = [
     {
       question: "Qu’est-ce qu’une vCard et pourquoi est-elle essentielle aujourd’hui ?",
-      answer: "Une vCard est une carte de visite numérique interactive qui centralise toutes vos informations professionnelles : photo, description, liens, réseaux sociaux, boutique, portfolio, QR code, etc. Contrairement à une carte papier, elle ne se perd jamais et s’actualise en un clic. Pour une femme entrepreneure, c’est un outil puissant de crédibilité, de réseau et de conversion client."
+      answer: "Une vCard est une carte de visite numérique interactive qui centralise toutes vos informations professionnelles : photo, description, liens, réseaux sociaux, boutique, portfolio, QR code, etc. Contrairement à une carte papier, elle ne se perd jamais et s’actualise en un clic."
     },
     {
       question: "En quoi une vCard est-elle meilleure qu’un simple profil LinkedIn ?",
-      answer: "LinkedIn vous appartient… jusqu’à ce que l’algorithme change. Une vCard, elle, vous appartient à 100 % : vous contrôlez l’apparence, les données, et l’expérience de vos visiteurs. Elle devient votre carte de marque personnelle, que vous pouvez partager partout — sur vos réseaux, dans vos emails, ou même via un QR code sur vos produits."
+      answer: "LinkedIn vous appartient… jusqu’à ce que l’algorithme change. Une vCard, elle, vous appartient à 100 % : vous contrôlez l’apparence, les données, et l’expérience de vos visiteurs."
     },
     {
       question: "Puis-je utiliser une vCard même si je débute dans mon activité ?",
-      answer: "Absolument. Une vCard ne sert pas uniquement aux marques établies. C’est un levier de professionnalisation immédiat : elle permet de présenter votre activité avec élégance, même à ses débuts, et de prouver votre sérieux face à vos premiers partenaires ou clients. Elle évolue avec vous, comme un mini-site toujours à jour."
-    },
-    {
-      question: "Est-ce difficile à créer ou à personnaliser ?",
-      answer: "Non, c’est conçu pour être simple, intuitif et sans compétences techniques. En quelques minutes, vous choisissez un modèle, ajoutez vos informations, vos liens, vos couleurs et votre photo. Votre vCard est ensuite accessible partout, même depuis un smartphone. Vous pouvez la modifier à tout moment pour suivre votre évolution."
+      answer: "Absolument. Une vCard ne sert pas uniquement aux marques établies. C’est un levier de professionnalisation immédiat."
     }
   ];
 
@@ -55,7 +79,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-purple-600/10 rounded-full blur-[160px] animate-pulse"></div>
         <div className="absolute bottom-[-20%] right-[-10%] w-[80%] h-[80%] bg-blue-600/10 rounded-full blur-[180px]"></div>
-        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-px h-[1000px] bg-gradient-to-b from-transparent via-purple-500/20 to-transparent rotate-45"></div>
       </div>
 
       {/* Navigation */}
@@ -65,63 +88,94 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-transform hover:rotate-12 cursor-pointer font-['Bricolage_Grotesque']">W</div>
             <span className="font-black text-2xl tracking-tighter">WomenCards<span className="text-purple-500">.</span></span>
           </div>
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={onGetStarted}
-              className="bg-white text-[#0A0118] px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95 border border-white"
-            >
-              Démarrer
-            </button>
-          </div>
+          <button 
+            onClick={onGetStarted}
+            className="bg-white text-[#0A0118] px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl border border-white"
+          >
+            Démarrer
+          </button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-48 pb-20 px-6 lg:px-20 min-h-[90vh] flex items-center">
-        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-20 items-center">
+      <section className="relative pt-40 lg:pt-48 pb-20 px-6 lg:px-20 min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           
-          {/* Left Content */}
           <div className="text-left z-10 animate-in fade-in slide-in-from-left-10 duration-1000">
-            <h1 className="text-5xl lg:text-[6.5rem] font-extrabold leading-[0.9] tracking-tighter mb-10 uppercase font-['Bricolage_Grotesque']">
+            <h1 className="text-4xl lg:text-7xl font-extrabold leading-[1] tracking-tighter mb-8 uppercase font-['Bricolage_Grotesque']">
               Un Clic. <br />
               Une Femme. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">Une Légende.</span>
             </h1>
             
-            <p className="text-lg lg:text-xl text-gray-400 mb-14 leading-relaxed max-w-xl font-medium">
-              Pour les femmes professionnelles actives sur plusieurs plateformes et qui veulent unifier leur présence en un seul lien sur <span className="text-white font-bold">women.cards</span>.
+            <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-xl font-medium">
+              Pour les femmes professionnelles qui veulent unifier leur présence en un seul lien sur <span className="text-white font-bold">women.cards</span>.
             </p>
+
+            {/* Subdomain Search Engine */}
+            <div className="mb-12 w-full max-w-lg animate-in slide-in-from-bottom-8 duration-700 delay-300">
+               <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-[2.5rem] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
+                  <div className="relative bg-white/5 backdrop-blur-3xl border border-white/10 p-2 rounded-[2rem] flex items-center gap-2 focus-within:border-purple-500/50 transition-all shadow-2xl">
+                    <div className="hidden sm:flex pl-6 text-gray-500 font-bold text-sm select-none">women.cards/</div>
+                    <input 
+                      type="text" 
+                      placeholder="votre-nom"
+                      value={searchUsername}
+                      onChange={(e) => checkUsername(e.target.value)}
+                      className="flex-1 bg-transparent px-4 sm:px-0 py-4 text-white font-black text-lg outline-none placeholder:text-gray-700"
+                    />
+                    <button 
+                      onClick={onGetStarted}
+                      className={`px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${availability === 'available' ? 'bg-green-500 text-white shadow-[0_0_30px_rgba(34,197,94,0.4)]' : 'bg-white text-black hover:bg-gray-200'}`}
+                    >
+                      {availability === 'checking' ? '...' : availability === 'available' ? 'RÉSERVER' : 'VÉRIFIER'}
+                    </button>
+                  </div>
+                  
+                  {/* Availability Badge */}
+                  <div className="mt-4 ml-6 flex items-center gap-3">
+                    {availability === 'checking' && (
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 border-2 border-purple-500 border-t-transparent animate-spin rounded-full"></div>
+                        <span className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Vérification...</span>
+                      </div>
+                    )}
+                    {availability === 'available' && (
+                      <div className="flex items-center gap-2 animate-in fade-in zoom-in">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Disponible ! Prête à devenir une légende ?</span>
+                      </div>
+                    )}
+                    {availability === 'taken' && (
+                      <div className="flex items-center gap-2 animate-in fade-in zoom-in">
+                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                        <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">Ce pseudo est déjà réservé.</span>
+                      </div>
+                    )}
+                    {availability === 'idle' && searchUsername.length > 0 && searchUsername.length < 3 && (
+                      <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Minimum 3 caractères.</span>
+                    )}
+                  </div>
+               </div>
+            </div>
             
-            <button 
-              onClick={onGetStarted}
-              className="w-full sm:w-auto px-14 py-6 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-3xl font-black text-lg hover:shadow-[0_0_50px_rgba(147,51,234,0.3)] transition-all active:scale-95 group flex items-center justify-center gap-3"
-            >
-              Commencer maintenant
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button 
+                onClick={onGetStarted}
+                className="px-10 py-5 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:shadow-[0_0_50px_rgba(147,51,234,0.3)] transition-all active:scale-95 flex items-center justify-center gap-3"
+              >
+                Créer mon lien
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
           </div>
 
-          {/* Right Visual Content */}
           <div className="relative perspective-[2000px] hidden lg:block animate-in fade-in slide-in-from-right-10 duration-1000 delay-200">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-            {/* Engagement Metrics */}
-            <div className="absolute -top-10 left-0 z-20 bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-3xl shadow-2xl animate-bounce" style={{ animationDuration: '4s' }}>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center text-green-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
-                </div>
-                <div>
-                  <div className="text-xs font-black text-gray-500 uppercase tracking-widest">Analytics</div>
-                  <div className="text-xl font-black text-white">+248%</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Tilted VCard Model */}
             <div 
-              className="relative w-[380px] h-[520px] mx-auto bg-gradient-to-br from-[#1E0B3B] to-[#0A0118] border border-white/10 rounded-[4rem] shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden transform rotate-y-[-25deg] rotate-x-[15deg] rotate-z-[-5deg] hover:rotate-y-[-10deg] transition-transform duration-700"
-              style={{ transformStyle: 'preserve-3d' }}
+              className="relative w-[360px] h-[500px] mx-auto bg-gradient-to-br from-[#1E0B3B] to-[#0A0118] border border-white/10 rounded-[4rem] shadow-[0_50px_100px_rgba(0,0,0,0.8)] overflow-hidden transform rotate-y-[-25deg] rotate-x-[15deg] rotate-z-[-5deg] transition-transform duration-700 hover:rotate-y-[-10deg]"
             >
               <div className="absolute top-0 left-0 w-full h-full p-10 flex flex-col items-center">
                 <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full border-4 border-white/10 mb-8 overflow-hidden shadow-2xl">
@@ -129,63 +183,43 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 </div>
                 <div className="h-4 w-3/4 bg-white/10 rounded-full mb-3"></div>
                 <div className="h-3 w-1/2 bg-white/5 rounded-full mb-12"></div>
-                
                 <div className="w-full space-y-4">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-14 w-full bg-white/5 rounded-2xl border border-white/5 flex items-center px-6">
-                      <div className={`w-2 h-2 rounded-full mr-4 ${i === 1 ? 'bg-purple-500' : i === 2 ? 'bg-pink-500' : 'bg-blue-500'}`}></div>
-                      <div className={`h-3 rounded-full bg-white/10 ${i === 1 ? 'w-2/3' : i === 2 ? 'w-1/2' : 'w-3/4'}`}></div>
-                    </div>
+                    <div key={i} className="h-12 w-full bg-white/5 rounded-2xl border border-white/5"></div>
                   ))}
                 </div>
-
-                <div className="mt-auto opacity-30">
-                  <div className="text-[9px] font-black uppercase tracking-[0.4em] text-white font-['Bricolage_Grotesque']">women.cards/amina</div>
-                </div>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none"></div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Feature Cards Section */}
+      {/* Feature Cards */}
       <section className="relative pb-32 px-6 lg:px-20 z-10">
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
-          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] hover:bg-white/10 transition-all group relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl"></div>
-            <h3 className="text-xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-purple-400 transition-colors">Créez votre vCard digitale</h3>
-            <p className="text-gray-400 leading-relaxed font-medium">
-              Chaque femme a une histoire à raconter, une expertise à partager, un projet à valoriser.
-            </p>
+          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] hover:bg-white/10 transition-all group">
+            <h3 className="text-xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-purple-400">vCard Digitale</h3>
+            <p className="text-gray-400 leading-relaxed font-medium">Chaque femme a une histoire à raconter, une expertise à partager.</p>
           </div>
-
-          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] hover:bg-white/10 transition-all group relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl"></div>
-            <h3 className="text-xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-blue-400 transition-colors">Pourquoi?</h3>
-            <p className="text-gray-400 leading-relaxed font-medium">
-              Remplacez votre carte papier par une <span className="text-white font-bold">vCard digitale interactive</span> : plus moderne, plus durable, plus efficace.
-            </p>
+          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] hover:bg-white/10 transition-all group">
+            <h3 className="text-xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-blue-400">Pourquoi?</h3>
+            <p className="text-gray-400 leading-relaxed font-medium">Remplacez votre carte papier par une vCard digitale interactive.</p>
           </div>
-
-          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] hover:bg-white/10 transition-all group relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl"></div>
-            <h3 className="text-xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-pink-400 transition-colors">Quelle cible</h3>
-            <p className="text-gray-400 leading-relaxed font-medium">
-              Idéale pour les événements, réseaux sociaux, signatures d’email ou pitch rapide.
-            </p>
+          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] hover:bg-white/10 transition-all group">
+            <h3 className="text-xl font-black mb-6 uppercase tracking-tighter text-white group-hover:text-pink-400">Impact</h3>
+            <p className="text-gray-400 leading-relaxed font-medium">Idéale pour les réseaux sociaux, signatures d’email ou pitch rapide.</p>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
+      {/* FAQ */}
       <section className="relative pb-40 px-6 lg:px-20 z-10">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl lg:text-6xl font-black tracking-tighter uppercase mb-6 font-['Bricolage_Grotesque']">FAQ</h2>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-black tracking-tighter uppercase mb-6 font-['Bricolage_Grotesque']">FAQ</h2>
             <div className="w-20 h-1.5 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto rounded-full"></div>
           </div>
-          <div className="space-y-2 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[3rem] p-8 lg:p-12">
+          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[3rem] p-8 lg:p-12">
             {faqs.map((faq, index) => (
               <FAQItem key={index} question={faq.question} answer={faq.answer} />
             ))}
@@ -193,10 +227,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-24 border-t border-white/5 text-center bg-[#0A0118]">
-        <div className="flex items-center justify-center gap-3 mb-8">
-           <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center text-white text-sm font-black shadow-lg shadow-purple-900/40 font-['Bricolage_Grotesque']">W</div>
+      <footer className="py-20 border-t border-white/5 text-center bg-[#0A0118]">
+        <div className="flex items-center justify-center gap-3 mb-6">
+           <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center text-white text-sm font-black font-['Bricolage_Grotesque']">W</div>
            <span className="font-black text-xl tracking-tighter">womencards.</span>
         </div>
         <p className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em]">© 2026 WWW.WOMEN.CARDS</p>
