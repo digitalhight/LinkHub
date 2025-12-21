@@ -50,6 +50,16 @@ export const DEFAULT_THEMES: ThemeConfig[] = [
     buttonText: '#ffffff',
     textColor: '#831843',
     fontFamily: 'Inter',
+  },
+  {
+    id: 'lavender-mist',
+    name: 'Lavender',
+    backgroundStart: '#f5f3ff',
+    backgroundEnd: '#ede9fe',
+    buttonBg: '#8b5cf6',
+    buttonText: '#ffffff',
+    textColor: '#4c1d95',
+    fontFamily: 'Inter',
   }
 ];
 
