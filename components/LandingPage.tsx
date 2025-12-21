@@ -6,178 +6,112 @@ interface LandingPageProps {
 
 const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   return (
-    <div className="min-h-screen bg-[#F8F9FF] text-[#1A1A1A] selection:bg-indigo-100 selection:text-indigo-900 overflow-x-hidden">
-      {/* Background Orbs */}
+    <div className="min-h-screen bg-[#0A0118] text-white selection:bg-purple-500/30 overflow-x-hidden font-['Plus_Jakarta_Sans']">
+      {/* Cinematic Background Orbs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] right-[-5%] w-[60%] h-[60%] bg-gradient-to-br from-[#E0E7FF] to-[#F3F4FF] rounded-full blur-[120px] opacity-60"></div>
-        <div className="absolute bottom-[-10%] left-[-5%] w-[50%] h-[50%] bg-gradient-to-tr from-[#EEF2FF] to-white rounded-full blur-[100px] opacity-40"></div>
+        <div className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] bg-purple-600/20 rounded-full blur-[160px] animate-pulse"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-blue-600/10 rounded-full blur-[140px]"></div>
+        <div className="absolute top-[20%] right-[5%] w-[30%] h-[30%] bg-pink-600/10 rounded-full blur-[120px] animate-bounce" style={{ animationDuration: '10s' }}></div>
       </div>
 
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/40 backdrop-blur-md border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 bg-[#3D5AFE] rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-200">W</div>
-              <span className="font-black text-2xl tracking-tighter">womencards.</span>
+      <nav className="fixed top-0 w-full z-50 bg-[#0A0118]/40 backdrop-blur-xl border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-10">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(168,85,247,0.4)]">W</div>
+              <span className="font-black text-2xl tracking-tighter">WomenCards.</span>
             </div>
-            <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-500">
-              <a href="#" className="hover:text-black transition-colors">Produit</a>
-              <a href="#" className="hover:text-black transition-colors">Modèles</a>
-              <a href="#" className="hover:text-black transition-colors">Tarifs</a>
+            <div className="hidden lg:flex items-center gap-8 text-xs font-black uppercase tracking-widest text-gray-400">
+              <a href="#" className="hover:text-white transition-colors">Home</a>
+              <a href="#" className="hover:text-white transition-colors">Product</a>
+              <a href="#" className="hover:text-white transition-colors">Pricing</a>
+              <a href="#" className="hover:text-white transition-colors">Resources</a>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <button onClick={onGetStarted} className="text-sm font-bold text-gray-600 px-4 py-2 hover:text-black">Connexion</button>
+          <div className="flex items-center gap-6">
+            <button onClick={onGetStarted} className="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-white">Sign In</button>
             <button 
               onClick={onGetStarted}
-              className="bg-[#3D5AFE] text-white px-6 py-3 rounded-full text-sm font-extrabold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 active:scale-95"
+              className="bg-white text-[#0A0118] px-8 py-3.5 rounded-full text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95"
             >
-              Créer mon lien
+              Get Started
             </button>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 px-6">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+      <section className="relative pt-48 pb-32 px-6">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-10 animate-in fade-in slide-in-from-top-4 duration-1000">
+            <span className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-ping"></span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-purple-300">Beta Access Now Live</span>
+          </div>
           
-          {/* Left Column */}
-          <div className="z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <h1 className="text-6xl lg:text-[5rem] font-black leading-[1] tracking-tight mb-8">
-              L'outil de profil <span className="text-[#3D5AFE]">intuitif</span> pour les créatrices.
-            </h1>
-            <p className="text-xl text-gray-500 mb-10 leading-relaxed max-w-xl">
-              Automatisez votre présence en ligne avec WomenCards. Un seul lien pour centraliser vos réseaux, vos services et vos projets avec élégance.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-10">
-              <div className="relative group">
-                <button 
-                  onClick={onGetStarted}
-                  className="px-10 py-5 bg-[#3D5AFE] text-white rounded-2xl font-black text-xl hover:bg-blue-700 transition-all shadow-2xl shadow-blue-200 active:scale-95"
-                >
-                  Commencer gratuit
-                </button>
-                {/* Handwritten arrow & text */}
-                <div className="absolute -right-28 top-4 hidden xl:block">
-                  <div className="flex items-center gap-2">
-                    <svg width="40" height="20" viewBox="0 0 40 20" fill="none" className="rotate-[-10deg]">
-                      <path d="M1 1C1 1 15 15 38 18M38 18L32 12M38 18L30 19.5" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                    <span className="font-serif italic text-sm text-gray-700 whitespace-nowrap">pas de carte requise</span>
+          <h1 className="text-6xl lg:text-[7rem] font-black leading-[0.9] tracking-tighter mb-10 uppercase animate-in fade-in slide-in-from-bottom-8 duration-700">
+            Next-Gen AI <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500">For Creators</span>
+          </h1>
+          
+          <p className="text-lg lg:text-xl text-gray-400 mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
+            Stay ahead of the curve with AI-powered profile insights. Centralize your presence with real-time analytics and global compliance.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
+            <button 
+              onClick={onGetStarted}
+              className="w-full sm:w-auto px-12 py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl font-black text-lg hover:shadow-[0_0_40px_rgba(147,51,234,0.4)] transition-all active:scale-95"
+            >
+              Get started
+            </button>
+            <button className="w-full sm:w-auto px-12 py-5 bg-white/5 border border-white/10 rounded-2xl font-black text-lg hover:bg-white/10 transition-all">
+              Book A Demo
+            </button>
+          </div>
+
+          {/* Featured UI Mockup (Matching the image) */}
+          <div className="relative max-w-5xl mx-auto animate-in zoom-in-95 duration-1000 delay-300">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0118] via-transparent to-transparent z-10 h-64 top-auto -bottom-1"></div>
+            <div className="bg-[#120526]/80 backdrop-blur-3xl border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl shadow-purple-900/20">
+              <div className="h-14 border-b border-white/5 flex items-center px-8 justify-between">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500/20"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/20"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500/20"></div>
+                </div>
+                <div className="px-4 py-1.5 bg-white/5 rounded-full text-[10px] font-black text-gray-500">womencards.digital/amina</div>
+              </div>
+              <div className="p-10 text-left">
+                <div className="grid lg:grid-cols-4 gap-10">
+                  <div className="space-y-6">
+                    <div className="w-12 h-12 bg-purple-500/20 rounded-xl"></div>
+                    <div className="h-4 w-full bg-white/5 rounded-full"></div>
+                    <div className="h-4 w-3/4 bg-white/5 rounded-full"></div>
+                    <div className="h-4 w-1/2 bg-white/5 rounded-full"></div>
+                  </div>
+                  <div className="lg:col-span-3">
+                    <div className="h-64 w-full bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-[2rem] border border-white/5 flex items-center justify-center">
+                       <div className="text-center">
+                         <div className="text-4xl font-black text-white mb-2">84.2%</div>
+                         <div className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Growth Factor</div>
+                       </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* Social Proof */}
-            <div className="flex items-center gap-4">
-              <div className="flex text-yellow-400">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                ))}
-              </div>
-              <span className="text-xs font-black uppercase tracking-widest text-gray-400">Note 5 étoiles G2</span>
-            </div>
-          </div>
-
-          {/* Right Column - Floating UI */}
-          <div className="relative h-[600px] hidden lg:block animate-in zoom-in-95 duration-1000">
-            {/* Main Dashboard Card */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] bg-white rounded-[2rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.12)] border border-white p-8">
-              <div className="flex items-center justify-between mb-8">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Statistiques</p>
-                  <p className="text-2xl font-black">Performance</p>
-                </div>
-                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                  <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M3 3v18h18M7 16l4-4 4 4 6-6"/></svg>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100">
-                   <div className="w-10 h-10 rounded-xl bg-[#3D5AFE] flex items-center justify-center text-white">
-                     <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                   </div>
-                   <div className="flex-1">
-                     <p className="text-xs font-bold text-gray-400">Clics Totaux</p>
-                     <p className="text-lg font-black">21,973,024</p>
-                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                   <div className="p-4 rounded-2xl border border-gray-100">
-                     <p className="text-[10px] font-bold text-gray-400 uppercase">Conversion</p>
-                     <p className="text-lg font-black">12.5%</p>
-                   </div>
-                   <div className="p-4 rounded-2xl border border-gray-100">
-                     <p className="text-[10px] font-bold text-gray-400 uppercase">Nouveaux</p>
-                     <p className="text-lg font-black">8,455</p>
-                   </div>
-                </div>
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-gray-100">
-                <button className="w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-colors">Voir le rapport complet</button>
-              </div>
-            </div>
-
-            {/* Floating Avatars & Mini-cards */}
-            <div className="absolute top-20 right-10 w-24 h-24 rounded-full border-[6px] border-white shadow-2xl overflow-hidden animate-bounce" style={{ animationDuration: '4s' }}>
-              <img src="https://i.pravatar.cc/150?u=karima" alt="Profile" className="w-full h-full object-cover" />
-            </div>
-
-            <div className="absolute bottom-10 left-10 w-20 h-20 rounded-full border-[6px] border-white shadow-2xl overflow-hidden animate-bounce" style={{ animationDuration: '5s' }}>
-              <img src="https://i.pravatar.cc/150?u=jane" alt="Profile" className="w-full h-full object-cover" />
-            </div>
-
-            {/* Quote Card */}
-            <div className="absolute -bottom-12 -right-12 w-[280px] bg-white rounded-3xl shadow-2xl p-6 border border-white">
-              <div className="flex items-center gap-3 mb-4">
-                 <img src="https://i.pravatar.cc/100?u=sarah" alt="Sarah" className="w-10 h-10 rounded-full" />
-                 <div>
-                   <p className="text-xs font-black">Sarah Martin</p>
-                   <p className="text-[10px] text-gray-400">CEO @ CreativFlow</p>
-                 </div>
-              </div>
-              <p className="text-sm font-medium leading-relaxed italic text-gray-600">
-                "Centraliser mes liens avec WomenCards a littéralement doublé ma conversion sur Instagram."
-              </p>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Trust Bar */}
-      <div className="bg-white/40 py-12 border-y border-white/20">
-        <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-center items-center gap-12 opacity-30 grayscale">
-          <span className="font-black text-2xl tracking-tighter">stripe</span>
-          <span className="font-black text-2xl tracking-tighter">shopify</span>
-          <span className="font-black text-2xl tracking-tighter">adobe</span>
-          <span className="font-black text-2xl tracking-tighter">slack</span>
-          <span className="font-black text-2xl tracking-tighter">framer</span>
+      {/* Footer */}
+      <footer className="py-20 border-t border-white/5 text-center">
+        <div className="flex items-center justify-center gap-2 mb-6">
+           <div className="w-6 h-6 bg-purple-600 rounded-lg flex items-center justify-center text-white text-xs font-black">W</div>
+           <span className="font-black tracking-tighter opacity-50">womencards.</span>
         </div>
-      </div>
-
-      {/* Final CTA */}
-      <section className="py-32 px-6">
-        <div className="max-w-4xl mx-auto bg-[#3D5AFE] rounded-[3rem] p-16 text-center text-white relative overflow-hidden shadow-2xl shadow-blue-300">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-          <h2 className="text-4xl lg:text-5xl font-black mb-8 leading-tight">Prête à sublimer votre présence en ligne ?</h2>
-          <button 
-            onClick={onGetStarted}
-            className="px-12 py-6 bg-white text-[#3D5AFE] rounded-2xl font-black text-xl hover:bg-gray-50 transition-all shadow-xl active:scale-95"
-          >
-            Commencer maintenant
-          </button>
-          <p className="mt-8 text-blue-100 font-bold opacity-80 uppercase tracking-widest text-xs">Rejoignez 1,200+ créatrices aujourd'hui</p>
-        </div>
-      </section>
-
-      <footer className="py-12 px-6 border-t border-gray-100 text-center">
-        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">© 2024 WomenCards • Made with ❤️ for Creators</p>
+        <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em]">© 2024 Next-Gen AI Collective</p>
       </footer>
     </div>
   );

@@ -161,10 +161,10 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#FDFDFF] z-[9999]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-14 h-14 bg-[#3D5AFE] rounded-[1.5rem] flex items-center justify-center text-white font-black text-2xl animate-pulse shadow-2xl shadow-blue-100">W</div>
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em] animate-bounce">Chargement...</p>
+      <div className="fixed inset-0 flex items-center justify-center bg-[#0A0118] z-[9999]">
+        <div className="flex flex-col items-center gap-4 text-white">
+          <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-[1.5rem] flex items-center justify-center text-white font-black text-2xl animate-pulse shadow-2xl shadow-purple-900/40">W</div>
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">Initializing System...</p>
         </div>
       </div>
     );
@@ -179,13 +179,9 @@ const App: React.FC = () => {
     if (!userId) { window.location.href = '/'; return null; }
     if (!isAdmin) {
       return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-10 text-center">
-          <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-          <h2 className="text-2xl font-black text-gray-900 mb-2">Accès Refusé</h2>
-          <p className="text-gray-500 max-w-xs mb-8 font-medium">Vous n'avez pas les permissions nécessaires.</p>
-          <button onClick={() => window.location.href = '/'} className="px-8 py-3 bg-gray-900 text-white rounded-full font-black text-xs uppercase tracking-widest shadow-xl">Retour</button>
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#0A0118] p-10 text-white">
+          <h2 className="text-2xl font-black mb-2">Access Denied</h2>
+          <button onClick={() => window.location.href = '/'} className="px-8 py-3 bg-white text-black rounded-full font-black text-xs uppercase tracking-widest">Back</button>
         </div>
       );
     }
@@ -204,109 +200,80 @@ const App: React.FC = () => {
   const fullProfileUrl = `${window.location.origin}/${profile.username}`;
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-gray-50 font-['Plus_Jakarta_Sans']">
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#0A0118] font-['Plus_Jakarta_Sans'] text-white">
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={(id) => { setUserId(id); fetchProfile(id); }} />
       
-      <header className="h-16 border-b border-gray-100 bg-white flex items-center px-6 justify-between flex-shrink-0 z-20 shadow-sm">
+      <header className="h-16 border-b border-white/5 bg-[#0A0118]/80 backdrop-blur-md flex items-center px-8 justify-between flex-shrink-0 z-20">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#3D5AFE] rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg">W</div>
-          <h1 className="font-black text-lg tracking-tighter">WomenCards<span className="text-[#3D5AFE]">.</span></h1>
+          <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg shadow-purple-900/20">W</div>
+          <h1 className="font-black text-lg tracking-tighter">WomenCards<span className="text-purple-500">.</span></h1>
         </div>
         
         <div className="flex gap-4 items-center">
-          {(profile.is_admin || userAuthEmail === 'digitalhight2025@gmail.com') && (
-            <button 
-              onClick={() => window.location.href = '/admin'} 
-              className="text-[10px] font-black text-amber-600 hover:text-amber-700 uppercase tracking-widest px-4 py-2 bg-amber-50 rounded-lg transition-colors border border-amber-100 flex items-center gap-2"
-            >
-              <div className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></div>
-              Tableau de Bord Admin
-            </button>
-          )}
-          <div className="h-6 w-px bg-gray-100 mx-2"></div>
-          <button onClick={() => { supabase.auth.signOut().then(() => { setUserId(''); window.location.href = '/'; }); }} className="text-[10px] font-black text-gray-400 hover:text-red-500 uppercase tracking-widest transition-colors">Déconnexion</button>
+          <button onClick={() => { supabase.auth.signOut().then(() => { setUserId(''); window.location.href = '/'; }); }} className="text-[10px] font-black text-gray-500 hover:text-white uppercase tracking-widest transition-colors">Sign Out</button>
           <button 
             onClick={handleSave} 
             disabled={saving} 
-            className={`text-[11px] font-black px-8 py-2.5 rounded-full transition-all shadow-xl ${saveSuccess ? 'bg-green-500 text-white shadow-green-100' : 'bg-[#3D5AFE] text-white shadow-blue-100 active:scale-95 disabled:opacity-50'}`}
+            className={`text-[11px] font-black px-8 py-2.5 rounded-full transition-all shadow-xl ${saveSuccess ? 'bg-green-500 text-white' : 'bg-white text-black hover:bg-gray-100 active:scale-95 disabled:opacity-50'}`}
           >
-            {saving ? 'PROCESS...' : saveSuccess ? 'SAUVEGARDÉ !' : 'ENREGISTRER'}
+            {saving ? 'SYNCING...' : saveSuccess ? 'SAVED' : 'PUBLISH'}
           </button>
         </div>
       </header>
 
       <main className="flex-1 flex overflow-hidden">
-        {/* Sidebar avec Onglets */}
-        <div className="w-full lg:w-[420px] bg-white border-r border-gray-100 flex flex-col flex-shrink-0 overflow-hidden">
-          {/* Tab Navigation */}
-          <div className="px-8 pt-6 pb-2 border-b border-gray-50 flex gap-8">
+        {/* Sidebar */}
+        <div className="w-full lg:w-[400px] bg-[#0F0421]/50 border-r border-white/5 flex flex-col flex-shrink-0 overflow-hidden backdrop-blur-xl">
+          <div className="px-10 pt-8 pb-4 border-b border-white/5 flex gap-10">
             <button 
               onClick={() => setActiveEditorTab('profile')}
-              className={`pb-4 text-xs font-black uppercase tracking-widest relative transition-all ${activeEditorTab === 'profile' ? 'text-[#3D5AFE]' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`pb-4 text-[10px] font-black uppercase tracking-widest relative transition-all ${activeEditorTab === 'profile' ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}
             >
-              Profil
-              {activeEditorTab === 'profile' && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#3D5AFE] rounded-full animate-in fade-in slide-in-from-bottom-1"></div>}
+              Organization
+              {activeEditorTab === 'profile' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500 rounded-full"></div>}
             </button>
             <button 
               onClick={() => setActiveEditorTab('links')}
-              className={`pb-4 text-xs font-black uppercase tracking-widest relative transition-all ${activeEditorTab === 'links' ? 'text-[#3D5AFE]' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`pb-4 text-[10px] font-black uppercase tracking-widest relative transition-all ${activeEditorTab === 'links' ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}
             >
-              Liens
-              {activeEditorTab === 'links' && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#3D5AFE] rounded-full animate-in fade-in slide-in-from-bottom-1"></div>}
+              Assets
+              {activeEditorTab === 'links' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-500 rounded-full"></div>}
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto no-scrollbar p-8">
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-              {activeEditorTab === 'profile' ? (
-                <div>
-                  <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#3D5AFE] rounded-full"></span>
-                    Profil de la créatrice
-                  </h2>
-                  <ProfileSection profile={profile} setProfile={setProfile} />
-                </div>
-              ) : (
-                <div>
-                  <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-orange-400 rounded-full"></span>
-                    Catalogue de liens
-                  </h2>
-                  <LinksSection profile={profile} setProfile={setProfile} />
-                </div>
-              )}
-            </div>
+          <div className="flex-1 overflow-y-auto p-10 scrollbar-hide">
+            {activeEditorTab === 'profile' ? (
+              <ProfileSection profile={profile} setProfile={setProfile} />
+            ) : (
+              <LinksSection profile={profile} setProfile={setProfile} />
+            )}
           </div>
         </div>
 
-        {/* Aperçu Mobile */}
-        <div className="hidden lg:flex flex-1 bg-[#FDFDFF] items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(#3d5afe_1px,transparent_1px)] [background-size:40px_40px] opacity-[0.04]"></div>
-          <div className="relative z-10 flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-500">
-            <div className="bg-white/80 backdrop-blur-md px-5 py-2.5 rounded-full border border-white shadow-sm mb-2 group cursor-pointer hover:bg-white transition-all active:scale-95" onClick={() => window.open(fullProfileUrl, '_blank')}>
-              <p className="text-[11px] font-black text-[#3D5AFE] tracking-tight flex items-center gap-3">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                <span className="opacity-40 font-bold uppercase tracking-widest text-[9px] mr-[-4px]">Ma Page :</span>
-                <span className="underline decoration-blue-200 underline-offset-4">{fullProfileUrl.replace('https://', '').replace('http://', '')}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-30 group-hover:opacity-100 transition-opacity"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              </p>
-            </div>
-            <div className="scale-90 xl:scale-100 drop-shadow-[0_40px_80px_rgba(0,0,0,0.1)]">
-              <PhonePreview profile={profile} />
-            </div>
+        {/* Preview Container */}
+        <div className="hidden lg:flex flex-1 bg-[#05010D] items-center justify-center relative overflow-hidden">
+          {/* Ambient Glows */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px]"></div>
+          
+          <div className="relative z-10 flex flex-col items-center gap-8 animate-in zoom-in duration-700">
+             <div className="bg-white/5 backdrop-blur-2xl px-6 py-3 rounded-2xl border border-white/10 group cursor-pointer hover:bg-white/10 transition-all active:scale-95" onClick={() => window.open(fullProfileUrl, '_blank')}>
+                <p className="text-[10px] font-black text-gray-400 tracking-widest uppercase flex items-center gap-4">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                  live.digital/{profile.username}
+                  <svg className="opacity-40 group-hover:opacity-100 transition-opacity" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
+                </p>
+             </div>
+             <div className="scale-90 xl:scale-100 drop-shadow-[0_40px_80px_rgba(0,0,0,0.5)] border-[12px] border-[#120526] rounded-[4rem] bg-black overflow-hidden shadow-2xl">
+                <PhonePreview profile={profile} />
+             </div>
           </div>
         </div>
 
-        {/* Section Thème */}
-        <div className="hidden xl:flex w-[380px] bg-white border-l border-gray-100 flex-col flex-shrink-0 overflow-y-auto no-scrollbar">
-          <div className="p-8 space-y-12">
-            <div>
-              <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
-                Thèmes & Couleurs
-              </h2>
-              <ThemeSection profile={profile} setProfile={setProfile} />
-            </div>
+        {/* Theme Sidebar */}
+        <div className="hidden xl:flex w-[350px] bg-[#0F0421]/30 border-l border-white/5 flex-col flex-shrink-0 overflow-y-auto backdrop-blur-xl">
+          <div className="p-10">
+            <h2 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-8">Theme Engine</h2>
+            <ThemeSection profile={profile} setProfile={setProfile} />
           </div>
         </div>
       </main>
