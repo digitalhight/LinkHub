@@ -105,7 +105,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
           <button onClick={() => fetchProfiles()} className="p-2 text-gray-400 hover:text-blue-500 transition-colors">
             <svg className={loading ? "animate-spin" : ""} xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
           </button>
-          <div className="h-8 w-px bg-gray-100"></div>
+          <div className="h-8 w-px bg-gray-100 mx-2"></div>
           <button onClick={() => window.location.href = '/'} className="text-[11px] font-black text-gray-500 hover:text-[#3D5AFE] uppercase tracking-widest transition-all">Retour Éditeur</button>
         </div>
       </header>
@@ -165,7 +165,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
                 <tr className="bg-white border-b border-gray-50">
                   <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Utilisatrice</th>
                   <th className="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Email</th>
-                  <th className="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Téléphone</th>
+                  <th className="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">WhatsApp</th>
                   <th className="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Liens</th>
                   <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
                 </tr>
@@ -203,7 +203,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
                       <p className="text-[11px] font-bold text-gray-500">{p.email || '—'}</p>
                     </td>
                     <td className="px-6 py-6">
-                      <p className="text-[11px] font-bold text-gray-500">{p.phone || '—'}</p>
+                      {p.phone ? (
+                        <a 
+                          href={`https://wa.me/${p.phone.replace(/[^0-9]/g, '')}`} 
+                          target="_blank" 
+                          className="flex items-center gap-2 text-[11px] font-bold text-green-600 hover:text-green-700 transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                          {p.phone}
+                        </a>
+                      ) : (
+                        <p className="text-[11px] font-bold text-gray-400">—</p>
+                      )}
                     </td>
                     <td className="px-6 py-6 text-center">
                       <button onClick={() => setSelectedProfile(p)} className="px-3 py-1.5 bg-gray-50 text-[#3D5AFE] text-[10px] font-black rounded-lg hover:bg-blue-50 transition-colors">

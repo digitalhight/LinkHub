@@ -17,6 +17,7 @@ const App: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
   const [userAuthEmail, setUserAuthEmail] = useState<string>('');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [activeEditorTab, setActiveEditorTab] = useState<'profile' | 'links'>('profile');
   
   const [isPublicView, setIsPublicView] = useState(false);
   const [isAdminView, setIsAdminView] = useState(false);
@@ -235,25 +236,50 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 flex overflow-hidden">
-        <div className="w-full lg:w-[420px] bg-white border-r border-gray-100 flex flex-col flex-shrink-0 overflow-y-auto no-scrollbar">
-          <div className="p-8 space-y-12">
-            <div>
-              <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-[#3D5AFE] rounded-full"></span>
-                Profil de la créatrice
-              </h2>
-              <ProfileSection profile={profile} setProfile={setProfile} />
-            </div>
-            <div className="pt-8 border-t border-gray-50">
-              <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-orange-400 rounded-full"></span>
-                Catalogue de liens
-              </h2>
-              <LinksSection profile={profile} setProfile={setProfile} />
+        {/* Sidebar avec Onglets */}
+        <div className="w-full lg:w-[420px] bg-white border-r border-gray-100 flex flex-col flex-shrink-0 overflow-hidden">
+          {/* Tab Navigation */}
+          <div className="px-8 pt-6 pb-2 border-b border-gray-50 flex gap-8">
+            <button 
+              onClick={() => setActiveEditorTab('profile')}
+              className={`pb-4 text-xs font-black uppercase tracking-widest relative transition-all ${activeEditorTab === 'profile' ? 'text-[#3D5AFE]' : 'text-gray-400 hover:text-gray-600'}`}
+            >
+              Profil
+              {activeEditorTab === 'profile' && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#3D5AFE] rounded-full animate-in fade-in slide-in-from-bottom-1"></div>}
+            </button>
+            <button 
+              onClick={() => setActiveEditorTab('links')}
+              className={`pb-4 text-xs font-black uppercase tracking-widest relative transition-all ${activeEditorTab === 'links' ? 'text-[#3D5AFE]' : 'text-gray-400 hover:text-gray-600'}`}
+            >
+              Liens
+              {activeEditorTab === 'links' && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#3D5AFE] rounded-full animate-in fade-in slide-in-from-bottom-1"></div>}
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto no-scrollbar p-8">
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+              {activeEditorTab === 'profile' ? (
+                <div>
+                  <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-[#3D5AFE] rounded-full"></span>
+                    Profil de la créatrice
+                  </h2>
+                  <ProfileSection profile={profile} setProfile={setProfile} />
+                </div>
+              ) : (
+                <div>
+                  <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-orange-400 rounded-full"></span>
+                    Catalogue de liens
+                  </h2>
+                  <LinksSection profile={profile} setProfile={setProfile} />
+                </div>
+              )}
             </div>
           </div>
         </div>
 
+        {/* Aperçu Mobile */}
         <div className="hidden lg:flex flex-1 bg-[#FDFDFF] items-center justify-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(#3d5afe_1px,transparent_1px)] [background-size:40px_40px] opacity-[0.04]"></div>
           <div className="relative z-10 flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-500">
@@ -271,6 +297,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
+        {/* Section Thème */}
         <div className="hidden xl:flex w-[380px] bg-white border-l border-gray-100 flex-col flex-shrink-0 overflow-y-auto no-scrollbar">
           <div className="p-8 space-y-12">
             <div>
