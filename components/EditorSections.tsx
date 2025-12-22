@@ -30,7 +30,6 @@ export const ProfileSection: React.FC<{ profile: UserProfile, setProfile: (p: Us
       const fileExt = file.name.split('.').pop();
       const fileName = `avatar-${Date.now()}.${fileExt}`;
       
-      // CRUCIAL : Le chemin doit commencer par l'ID de l'utilisateur pour respecter la Policy "UID folder"
       const filePath = `${session.user.id}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
