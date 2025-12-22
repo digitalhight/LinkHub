@@ -146,32 +146,45 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </button>
           </div>
 
+          {/* GSM Mockup Corrected */}
           <div className="relative hidden lg:block animate-in fade-in slide-in-from-right-10 duration-1000 delay-200">
-             <div className="relative w-[360px] h-[580px] mx-auto drop-shadow-[0_40px_80px_rgba(0,0,0,0.6)]">
-                {/* Mockup decoration */}
+             <div className="relative w-[340px] h-[600px] mx-auto drop-shadow-[0_40px_80px_rgba(0,0,0,0.6)]">
+                {/* Decoration shadow */}
                 <div className="absolute -inset-4 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-[4.5rem] blur-2xl"></div>
-                <div className="relative h-full w-full bg-[#120526] border-[12px] border-[#1C0933] rounded-[4rem] overflow-hidden shadow-2xl ring-1 ring-white/10">
-                  {/* Mock Profile Content */}
-                  <div className="h-full w-full bg-gradient-to-b from-[#0F011E] to-[#2D0B5A] p-8 flex flex-col items-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-6 border-2 border-white/20 overflow-hidden shadow-2xl">
-                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt="Mélanie Dubois" />
+                
+                {/* Phone frame */}
+                <div className="relative h-full w-full bg-[#0F011E] border-[14px] border-[#1C0933] rounded-[4rem] overflow-hidden shadow-2xl ring-1 ring-white/10 flex flex-col">
+                  {/* Internal Mock Content with scroll safety */}
+                  <div className="flex-1 w-full bg-gradient-to-b from-[#0F011E] via-[#1A0538] to-[#2D0B5A] px-6 pt-12 pb-8 flex flex-col items-center overflow-y-auto scrollbar-hide">
+                    {/* Centered Profile Image Container */}
+                    <div className="w-24 h-24 mb-6 relative flex-shrink-0">
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full animate-pulse blur-sm opacity-50"></div>
+                      <div className="relative w-full h-full rounded-full border-2 border-white/20 overflow-hidden shadow-2xl flex items-center justify-center bg-black">
+                        <img 
+                          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=400" 
+                          className="w-full h-full object-cover object-center scale-105" 
+                          alt="Mélanie Dubois" 
+                        />
+                      </div>
                     </div>
                     
-                    <h4 className="text-white font-black text-xl mb-2 tracking-tight">Mélanie Dubois</h4>
-                    <p className="text-purple-200 text-[10px] text-center font-medium leading-relaxed mb-10 opacity-80">
+                    <h4 className="text-white font-black text-xl mb-1 tracking-tight text-center">Mélanie Dubois</h4>
+                    <p className="text-purple-300 text-[9px] font-black uppercase tracking-[0.2em] mb-4">@melanie_dubois</p>
+                    
+                    <p className="text-gray-300 text-[11px] text-center font-medium leading-relaxed mb-10 opacity-90 max-w-[200px]">
                       Photographe de mode & Créatrice.<br/>Capturer l'essence de l'instant.<br/>📸✨ Paris | Dubai
                     </p>
 
-                    <div className="w-full space-y-4">
+                    <div className="w-full space-y-3">
                       {dummyLinks.map((link, i) => (
-                        <div key={i} className="w-full py-4 bg-purple-500/90 text-white rounded-2xl border border-white/10 flex items-center justify-center shadow-lg transition-transform hover:scale-105 cursor-default">
+                        <div key={i} className="w-full py-4 bg-white/5 backdrop-blur-md text-white rounded-2xl border border-white/10 flex items-center justify-center shadow-lg transition-all hover:bg-white/10 cursor-default">
                           <span className="text-[10px] font-black uppercase tracking-widest">{link.title}</span>
                         </div>
                       ))}
                     </div>
 
-                    <div className="mt-auto pt-8">
-                       <span className="text-[8px] font-black uppercase tracking-[0.4em] text-white/30">women.cards/melanie</span>
+                    <div className="mt-12 opacity-30">
+                       <span className="text-[7px] font-black uppercase tracking-[0.4em] text-white">women.cards/melanie</span>
                     </div>
                   </div>
                 </div>
