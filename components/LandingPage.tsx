@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
 
-interface LandingPageProps {
-  onGetStarted: () => void;
+interface FAQItemProps {
+  question: string;
+  answer: string;
 }
 
-const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => {
+const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -29,6 +30,10 @@ const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, ans
     </div>
   );
 };
+
+interface LandingPageProps {
+  onGetStarted: () => void;
+}
 
 const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   const [searchUsername, setSearchUsername] = useState('');
@@ -57,6 +62,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       setAvailability('idle');
     }
   };
+
+  const dummyLinks = [
+    { title: '📸 Mon Portfolio 2024', url: '#' },
+    { title: '📅 Réserver un Shooting', url: '#' },
+    { title: '📱 Instagram (@melanie.photos)', url: '#' },
+    { title: '💬 Contact WhatsApp', url: '#' }
+  ];
 
   return (
     <div className="min-h-screen bg-[#0A0118] text-white selection:bg-purple-500/30 overflow-x-hidden font-['Plus_Jakarta_Sans']">
@@ -139,18 +151,27 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 {/* Mockup decoration */}
                 <div className="absolute -inset-4 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-[4.5rem] blur-2xl"></div>
                 <div className="relative h-full w-full bg-[#120526] border-[12px] border-[#1C0933] rounded-[4rem] overflow-hidden shadow-2xl ring-1 ring-white/10">
-                  <div className="p-8 flex flex-col items-center">
-                    <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-6 border-2 border-white/10 overflow-hidden shadow-xl">
-                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" />
+                  {/* Mock Profile Content */}
+                  <div className="h-full w-full bg-gradient-to-b from-[#0F011E] to-[#2D0B5A] p-8 flex flex-col items-center">
+                    <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-6 border-2 border-white/20 overflow-hidden shadow-2xl">
+                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt="Mélanie Dubois" />
                     </div>
-                    <div className="h-4 w-1/2 bg-white/10 rounded-full mb-3"></div>
-                    <div className="h-2.5 w-1/3 bg-white/5 rounded-full mb-10"></div>
-                    <div className="w-full space-y-3">
-                      {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="h-14 w-full bg-white/5 rounded-2xl border border-white/5 flex items-center justify-center">
-                          <div className="h-2 w-1/3 bg-white/10 rounded-full"></div>
+                    
+                    <h4 className="text-white font-black text-xl mb-2 tracking-tight">Mélanie Dubois</h4>
+                    <p className="text-purple-200 text-[10px] text-center font-medium leading-relaxed mb-10 opacity-80">
+                      Photographe de mode & Créatrice.<br/>Capturer l'essence de l'instant.<br/>📸✨ Paris | Dubai
+                    </p>
+
+                    <div className="w-full space-y-4">
+                      {dummyLinks.map((link, i) => (
+                        <div key={i} className="w-full py-4 bg-purple-500/90 text-white rounded-2xl border border-white/10 flex items-center justify-center shadow-lg transition-transform hover:scale-105 cursor-default">
+                          <span className="text-[10px] font-black uppercase tracking-widest">{link.title}</span>
                         </div>
                       ))}
+                    </div>
+
+                    <div className="mt-auto pt-8">
+                       <span className="text-[8px] font-black uppercase tracking-[0.4em] text-white/30">women.cards/melanie</span>
                     </div>
                   </div>
                 </div>
