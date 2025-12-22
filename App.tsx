@@ -25,9 +25,6 @@ const App: React.FC = () => {
   const [notFound, setNotFound] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(false);
 
-  // État pour le QR Code sélectionné dans le panneau de droite
-  const [selectedQrLink, setSelectedQrLink] = useState<{title: string, url: string} | null>(null);
-
   useEffect(() => {
     const checkRouting = () => {
       const pathSegments = window.location.pathname.split('/').filter(Boolean);
@@ -201,8 +198,7 @@ const App: React.FC = () => {
   }
 
   const profileUrl = `${window.location.origin}/${profile.username}`;
-  const currentQrTarget = selectedQrLink || { title: "Profil Principal", url: profileUrl };
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(currentQrTarget.url)}&bgcolor=120526&color=ffffff&margin=10`;
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(profileUrl)}&bgcolor=120526&color=ffffff&margin=10`;
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#0A0118] font-['Plus_Jakarta_Sans'] text-white">
@@ -278,66 +274,31 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Panneau de droite - QR Hub */}
+        {/* Panneau de droite - QR Hub (Simplifié: Profil uniquement) */}
         <div className="hidden xl:flex w-[380px] bg-[#0A0118] border-l border-white/5 flex-col p-8 gap-6 z-10">
            <div className="space-y-6">
               <div className="bg-white/5 backdrop-blur-3xl p-6 rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col items-center gap-5 transition-all">
                 <div className="w-full flex justify-between items-center">
-                  <span className="text-[9px] font-black text-purple-400 uppercase tracking-[0.3em]">Générateur QR</span>
+                  <span className="text-[9px] font-black text-purple-400 uppercase tracking-[0.3em]">QR Code Profil</span>
                   <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.8)]"></div>
                 </div>
 
                 <div className="w-48 h-48 bg-[#120526] p-5 rounded-[2rem] border border-white/5 shadow-inner overflow-hidden flex items-center justify-center">
-                  <img src={qrCodeUrl} alt="QR Code" className="w-full h-full object-contain filter brightness-110" />
+                  <img src={qrCodeUrl} alt="QR Code Profil" className="w-full h-full object-contain filter brightness-110" />
                 </div>
 
                 <div className="text-center space-y-1">
-                  <h4 className="text-[11px] font-black text-white uppercase tracking-widest truncate max-w-full">{currentQrTarget.title}</h4>
-                  <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest truncate max-w-full opacity-60">women.cards/{profile.username}{selectedQrLink ? `/${selectedQrLink.title.toLowerCase().substring(0,8)}` : ''}</p>
+                  <h4 className="text-[11px] font-black text-white uppercase tracking-widest truncate max-w-full">Profil Principal</h4>
+                  <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest truncate max-w-full opacity-60">women.cards/{profile.username}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 w-full">
-                  <button onClick={() => copyToClipboard(currentQrTarget.url)} className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all ${copyFeedback ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'}`}>
-                    {copyFeedback ? 'Copié' : 'Lien'}
+                  <button onClick={() => copyToClipboard(profileUrl)} className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all ${copyFeedback ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'}`}>
+                    {copyFeedback ? 'Copié' : 'Copier Lien'}
                   </button>
                   <button onClick={() => window.open(qrCodeUrl, '_blank')} className="flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">
                     Agrandir
                   </button>
-                </div>
-              </div>
-
-              {/* Liste des QR alternatifs */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between px-2">
-                   <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Sélecteur d'URL</h3>
-                   <span className="text-[9px] font-bold text-purple-500/50">{profile.links.filter(l => l.isActive).length + 1} disponibles</span>
-                </div>
-
-                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
-                  <button 
-                    onClick={() => setSelectedQrLink(null)}
-                    className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left ${selectedQrLink === null ? 'bg-purple-600/10 border-purple-500/30' : 'bg-white/5 border-white/5 hover:bg-white/[0.08]'}`}
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-xs">P</div>
-                    <div className="flex-1 overflow-hidden">
-                      <p className="text-[10px] font-black uppercase tracking-tight text-white truncate">Profil Principal</p>
-                      <p className="text-[8px] font-bold text-gray-500 truncate">Bio, Liens, Contact</p>
-                    </div>
-                  </button>
-
-                  {profile.links.filter(l => l.isActive).map((link) => (
-                    <button 
-                      key={link.id}
-                      onClick={() => setSelectedQrLink({ title: link.title, url: link.url })}
-                      className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left ${selectedQrLink?.url === link.url ? 'bg-purple-600/10 border-purple-500/30' : 'bg-white/5 border-white/5 hover:bg-white/[0.08]'}`}
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-gray-400 font-bold text-[10px]">🔗</div>
-                      <div className="flex-1 overflow-hidden">
-                        <p className="text-[10px] font-black uppercase tracking-tight text-white truncate">{link.title}</p>
-                        <p className="text-[8px] font-bold text-gray-500 truncate">{link.url}</p>
-                      </div>
-                    </button>
-                  ))}
                 </div>
               </div>
            </div>
@@ -345,7 +306,7 @@ const App: React.FC = () => {
            <div className="mt-auto bg-gradient-to-br from-purple-600/10 to-transparent p-6 rounded-3xl border border-white/5">
               <p className="text-[10px] font-black text-purple-400 uppercase tracking-[0.2em] mb-2">Conseil Marketing</p>
               <p className="text-[10px] text-gray-500 leading-relaxed font-medium">
-                Utilisez les QR codes individuels sur vos supports physiques pour diriger vos clients vers une offre spécifique.
+                Partagez ce QR code sur vos cartes de visite ou supports physiques pour permettre à vos clients d'accéder instantanément à tout votre univers digital.
               </p>
            </div>
         </div>
