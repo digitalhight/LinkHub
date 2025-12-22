@@ -103,7 +103,9 @@ export const ProfileSection: React.FC<{ profile: UserProfile, setProfile: (p: Us
               <p className="text-[10px] font-bold text-red-200 leading-relaxed uppercase tracking-tight">
                 {errorMsg}
                 <br /><br />
-                <span className="text-white">Action : Allez dans Supabase > Storage > avatars > Policies et assurez-vous d'avoir autorisé l'INSERT (Upload).</span>
+                <span className="text-white">
+                  {"Action : Allez dans Supabase > Storage > avatars > Policies et assurez-vous d'avoir autorisé l'INSERT (Upload)."}
+                </span>
               </p>
             </div>
           </div>
