@@ -13,6 +13,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
   const [stats, setStats] = useState({ totalProfiles: 0, totalLinks: 0, activeLinks: 0 });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProfile, setSelectedProfile] = useState<UserProfile | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProfiles();
@@ -35,6 +36,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
         links: Array.isArray(d.links) ? d.links : [],
         theme: d.theme || {},
         is_admin: d.is_admin || false,
+        is_active: d.is_active !== false, // Default to true if null/undefined
         created_at: d.created_at,
       }));
 
@@ -52,6 +54,40 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const toggleProfileStatus = async (profileId: string, currentStatus: boolean) => {
+    setActionLoading(profileId);
+    const newStatus = !currentStatus;
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_active: newStatus })
+        .eq('id', profileId);
+
+      if (error) throw error;
+
+      setProfiles(prev => prev.map(p => p.id === profileId ? { ...p, is_active: newStatus } : p));
+    } catch (err: any) {
+      alert("Erreur de mise à jour : " + err.message);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const deleteProfile = async (profileId: string) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce compte définitivement ?")) return;
+    
+    setActionLoading(profileId);
+    try {
+      const { error } = await supabase.from('profiles').delete().eq('id', profileId);
+      if (error) throw error;
+      setProfiles(prev => prev.filter(p => p.id !== profileId));
+    } catch (err: any) {
+      alert("Erreur lors de la suppression : " + err.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -83,7 +119,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
 
       <main className="flex-1 overflow-hidden flex p-8 gap-8">
         
-        {/* SECTION GAUCHE : CHIFFRES CLÉS (Titre 'Performances' supprimé pour équilibrage) */}
+        {/* SECTION GAUCHE : CHIFFRES CLÉS */}
         <aside className="w-[350px] space-y-6 overflow-y-auto pr-4 scrollbar-hide">
           <div className="bg-white/5 border border-white/5 p-8 rounded-[2.5rem] relative overflow-hidden group">
             <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all"></div>
@@ -103,21 +139,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
             </div>
           </div>
 
-          <div className="bg-white/5 border border-white/5 p-8 rounded-[2.5rem] relative overflow-hidden group">
-            <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-green-500/10 rounded-full blur-3xl group-hover:bg-green-500/20 transition-all"></div>
-            <p className="text-[10px] font-black text-green-400 uppercase tracking-widest mb-4">Engagement</p>
-            <div className="flex items-baseline gap-3">
-              <span className="text-5xl font-black text-white">
-                {stats.totalProfiles > 0 ? (stats.totalLinks / stats.totalProfiles).toFixed(1) : 0}
-              </span>
-              <span className="text-xs font-black text-gray-500 uppercase tracking-tighter">moyenne</span>
-            </div>
-          </div>
-
           <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 p-8 rounded-[2.5rem] border border-white/10">
-            <h3 className="text-xs font-black mb-4 uppercase tracking-widest text-white">Alerte Système</h3>
+            <h3 className="text-xs font-black mb-4 uppercase tracking-widest text-white">Modération Directe</h3>
             <p className="text-[11px] text-gray-400 leading-relaxed font-medium">
-              Toutes les connexions sont cryptées. L'accès administrateur est restreint au personnel autorisé uniquement.
+              Utilisez le bouton <b>Power</b> pour suspendre instantanément un profil public s'il ne respecte pas les conditions d'utilisation.
             </p>
           </div>
         </aside>
@@ -147,7 +172,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
               <thead className="sticky top-0 bg-[#0F0520] z-10">
                 <tr>
                   <th className="px-10 py-6 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Créatrice</th>
-                  <th className="px-6 py-6 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Contact</th>
+                  <th className="px-6 py-6 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Statut</th>
                   <th className="px-6 py-6 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] text-center">Liens</th>
                   <th className="px-10 py-6 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] text-right">Actions</th>
                 </tr>
@@ -158,7 +183,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
                 ) : filteredProfiles.length === 0 ? (
                   <tr><td colSpan={4} className="px-10 py-24 text-center text-xs text-gray-600 italic">Aucune créatrice trouvée.</td></tr>
                 ) : filteredProfiles.map((p) => (
-                  <tr key={p.id} className="hover:bg-white/[0.03] transition-all group">
+                  <tr key={p.id} className={`hover:bg-white/[0.03] transition-all group ${!p.is_active ? 'opacity-60 grayscale-[0.5]' : ''}`}>
                     <td className="px-10 py-6">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/10 flex-shrink-0 bg-white/5">
@@ -171,8 +196,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
                       </div>
                     </td>
                     <td className="px-6 py-6">
-                      <p className="text-[11px] font-bold text-gray-400 mb-1">{p.email || '—'}</p>
-                      {p.phone && <p className="text-[10px] font-black text-green-500 uppercase tracking-tighter">{p.phone}</p>}
+                      <div className="flex items-center gap-2">
+                        <div className={`w-1.5 h-1.5 rounded-full ${p.is_active ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+                        <span className={`text-[9px] font-black uppercase tracking-widest ${p.is_active ? 'text-green-500' : 'text-red-500'}`}>
+                          {p.is_active ? 'Actif' : 'Suspendu'}
+                        </span>
+                      </div>
+                      <p className="text-[9px] font-bold text-gray-600 mt-0.5 truncate max-w-[140px]">{p.email}</p>
                     </td>
                     <td className="px-6 py-6 text-center">
                       <button onClick={() => setSelectedProfile(p)} className="px-3 py-1 bg-white/5 text-purple-400 text-[10px] font-black rounded-lg border border-white/5 hover:bg-purple-500 hover:text-white transition-all">
@@ -181,13 +211,30 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
                     </td>
                     <td className="px-10 py-6 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        {/* Toggle Status */}
+                        <button 
+                          onClick={() => toggleProfileStatus(p.id!, p.is_active!)}
+                          disabled={actionLoading === p.id}
+                          className={`w-9 h-9 flex items-center justify-center rounded-xl border transition-all ${p.is_active ? 'text-green-500 bg-green-500/10 border-green-500/20 hover:bg-red-500 hover:text-white hover:border-red-500' : 'text-gray-500 bg-white/5 border-white/10 hover:bg-green-500 hover:text-white hover:border-green-500'}`}
+                        >
+                          {actionLoading === p.id ? (
+                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+                          )}
+                        </button>
+                        
                         <button 
                           onClick={() => p.username && window.open(`/${p.username}`, '_blank')}
                           className="w-9 h-9 flex items-center justify-center text-gray-500 hover:text-blue-400 bg-white/5 rounded-xl border border-white/5 hover:border-blue-400/30 transition-all"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                         </button>
-                        <button className="w-9 h-9 flex items-center justify-center text-gray-500 hover:text-red-400 bg-white/5 rounded-xl border border-white/5 hover:border-red-400/30 transition-all">
+                        
+                        <button 
+                          onClick={() => deleteProfile(p.id!)}
+                          className="w-9 h-9 flex items-center justify-center text-gray-500 hover:text-red-400 bg-white/5 rounded-xl border border-white/5 hover:border-red-400/30 transition-all"
+                        >
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                         </button>
                       </div>

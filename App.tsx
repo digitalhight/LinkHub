@@ -23,6 +23,7 @@ const App: React.FC = () => {
   const [isAdminView, setIsAdminView] = useState(false);
   const [publicUsername, setPublicUsername] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [deactivated, setDeactivated] = useState(false); // État pour profil suspendu
   const [copyFeedback, setCopyFeedback] = useState(false);
 
   useEffect(() => {
@@ -84,6 +85,7 @@ const App: React.FC = () => {
   const fetchPublicProfile = async (username: string) => {
     setLoading(true);
     setNotFound(false);
+    setDeactivated(false);
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -93,6 +95,8 @@ const App: React.FC = () => {
 
       if (error || !data) {
         setNotFound(true);
+      } else if (data.is_active === false) {
+        setDeactivated(true); // Gérer le cas du profil suspendu
       } else {
         setProfile({
           id: data.id,
@@ -104,6 +108,7 @@ const App: React.FC = () => {
           email: data.email || '',
           links: data.links || [],
           theme: data.theme || INITIAL_PROFILE.theme,
+          is_active: true
         });
       }
     } catch (err) {
@@ -128,6 +133,7 @@ const App: React.FC = () => {
           links: data.links || [],
           theme: data.theme || INITIAL_PROFILE.theme,
           is_admin: data.is_admin || false,
+          is_active: data.is_active !== false,
         });
       }
     } catch (err) {}
@@ -148,6 +154,7 @@ const App: React.FC = () => {
         email: profile.email || userAuthEmail,
         links: profile.links,
         theme: profile.theme,
+        is_active: profile.is_active,
         updated_at: new Date().toISOString(),
       };
       const { error } = await supabase.from('profiles').upsert(payload);
@@ -180,7 +187,7 @@ const App: React.FC = () => {
   }
 
   if (isPublicView) {
-    return <PublicProfile profile={profile} notFound={notFound} />;
+    return <PublicProfile profile={profile} notFound={notFound} deactivated={deactivated} />;
   }
 
   if (isAdminView) {
@@ -274,7 +281,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Panneau de droite - QR Hub (Simplifié: Profil uniquement) */}
+        {/* Panneau de droite - QR Hub */}
         <div className="hidden xl:flex w-[380px] bg-[#0A0118] border-l border-white/5 flex-col p-8 gap-6 z-10">
            <div className="space-y-6">
               <div className="bg-white/5 backdrop-blur-3xl p-6 rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col items-center gap-5 transition-all">

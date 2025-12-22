@@ -4,6 +4,7 @@ import { UserProfile } from '../types';
 interface PublicProfileProps {
   profile: UserProfile;
   notFound?: boolean;
+  deactivated?: boolean;
 }
 
 const Icons = {
@@ -12,7 +13,7 @@ const Icons = {
   WhatsApp: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-10.4 8.38 8.38 0 0 1 3.8.9L21 4.5ZM17 13c-.22 0-.44-.08-.61-.24l-1.5-1.5a.86.86 0 0 1 0-1.21l1.5-1.5c.34-.33.88-.33 1.22 0 .33.34.33.89 0 1.22l-1.5 1.5 1.5 1.5c.33.34.33.88 0 1.22-.17.17-.39.24-.61.25Z"/><path d="M12.5 12.5h.01"/><path d="M9 16c-.22 0-.44-.08-.61-.24l-1.5-1.5a.86.86 0 0 1 0-1.21l1.5-1.5c.34-.33.88-.33 1.22 0 .33.34.33.89 0 1.22l-1.5 1.5 1.5 1.5c.33.34.33.88 0 1.22-.17.17-.39.24-.61.25Z"/></svg>
 };
 
-const PublicProfile: React.FC<PublicProfileProps> = ({ profile, notFound }) => {
+const PublicProfile: React.FC<PublicProfileProps> = ({ profile, notFound, deactivated }) => {
   const { theme, links, name, bio, avatarUrl, phone, email } = profile;
 
   if (notFound) {
@@ -23,7 +24,20 @@ const PublicProfile: React.FC<PublicProfileProps> = ({ profile, notFound }) => {
         </div>
         <h1 className="text-2xl font-black mb-2 uppercase tracking-tighter">Profil Introuvable</h1>
         <p className="text-sm text-gray-500 mb-8 text-center max-w-xs font-medium">Ce lien ne correspond à aucun compte WomenCards actif.</p>
-        <a href="https://www.women.cards" className="px-8 py-4 bg-white text-black font-black rounded-2xl shadow-xl hover:scale-105 transition-all active:scale-95 text-sm uppercase tracking-widest">Créer mon profil</a>
+        <a href="/" className="px-8 py-4 bg-white text-black font-black rounded-2xl shadow-xl hover:scale-105 transition-all active:scale-95 text-sm uppercase tracking-widest">Créer mon profil</a>
+      </div>
+    );
+  }
+
+  if (deactivated) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 bg-[#0A0118] text-white font-['Plus_Jakarta_Sans']">
+        <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-3xl flex items-center justify-center mb-6 border border-red-500/20">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+        </div>
+        <h1 className="text-2xl font-black mb-2 uppercase tracking-tighter text-red-500">Compte Suspendu</h1>
+        <p className="text-sm text-gray-500 mb-8 text-center max-w-xs font-medium">Ce profil a été temporairement désactivé par l'administration.</p>
+        <a href="/" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-700 hover:text-white transition-colors">Retour à l'accueil</a>
       </div>
     );
   }
@@ -112,7 +126,7 @@ const PublicProfile: React.FC<PublicProfileProps> = ({ profile, notFound }) => {
 
         {/* Branding Footer */}
         <div className="mt-auto">
-          <a href="https://www.women.cards" className="flex flex-col items-center gap-2 group">
+          <a href="/" className="flex flex-col items-center gap-2 group">
             <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 group-hover:opacity-100 transition-opacity">Créé avec</span>
             <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/10 opacity-40 group-hover:opacity-100 transition-all">
                <div className="w-5 h-5 bg-[#A855F7] rounded-md flex items-center justify-center text-white font-black text-[10px]">W</div>

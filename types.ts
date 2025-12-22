@@ -28,6 +28,7 @@ export interface UserProfile {
   links: LinkItem[];
   theme: ThemeConfig;
   is_admin?: boolean;
+  is_active?: boolean; // Nouveau champ pour le statut du compte
   created_at?: string;
 }
 
