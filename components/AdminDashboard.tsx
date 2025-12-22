@@ -21,6 +21,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
 
   const fetchProfiles = async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data, error: sbError } = await supabase.from('profiles').select('*');
       if (sbError) throw sbError;
@@ -36,7 +37,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
         links: Array.isArray(d.links) ? d.links : [],
         theme: d.theme || {},
         is_admin: d.is_admin || false,
-        is_active: d.is_active !== false, // Default to true if null/undefined
+        is_active: d.is_active !== false,
         created_at: d.created_at,
       }));
 
@@ -52,6 +53,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
       });
     } catch (err: any) {
       setError(err.message);
+      console.error("Fetch Error:", err);
     } finally {
       setLoading(false);
     }
@@ -61,16 +63,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
     setActionLoading(profileId);
     const newStatus = !currentStatus;
     try {
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({ is_active: newStatus })
         .eq('id', profileId);
 
-      if (error) throw error;
+      if (updateError) {
+        if (updateError.message.includes('column') || updateError.message.includes('schema cache')) {
+          throw new Error("La colonne 'is_active' n'existe pas dans votre base de données Supabase. Veuillez l'ajouter via le script SQL dans la config.");
+        }
+        throw updateError;
+      }
 
       setProfiles(prev => prev.map(p => p.id === profileId ? { ...p, is_active: newStatus } : p));
     } catch (err: any) {
-      alert("Erreur de mise à jour : " + err.message);
+      alert("Erreur : " + err.message);
     } finally {
       setActionLoading(null);
     }
@@ -116,6 +123,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser }) => {
           <button onClick={() => window.location.href = '/'} className="text-[10px] font-black text-gray-400 hover:text-white uppercase tracking-widest border border-white/10 px-6 py-2 rounded-full transition-all">Retour Éditeur</button>
         </div>
       </header>
+
+      {error && (
+        <div className="mx-8 mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-between">
+           <div className="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-red-500"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <p className="text-[10px] font-black text-red-200 uppercase tracking-widest">Erreur Base de Données : {error}</p>
+           </div>
+           <button onClick={fetchProfiles} className="text-[9px] font-black text-red-500 uppercase tracking-widest hover:underline">Réessayer</button>
+        </div>
+      )}
 
       <main className="flex-1 overflow-hidden flex p-8 gap-8">
         

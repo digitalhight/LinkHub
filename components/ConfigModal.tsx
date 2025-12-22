@@ -9,6 +9,7 @@ interface ConfigModalProps {
 export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, onClose }) => {
   const [url, setUrl] = useState('');
   const [key, setKey] = useState('');
+  const [showSql, setShowSql] = useState(false);
 
   if (!isOpen) return null;
 
@@ -18,6 +19,15 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, onClose }) => 
       saveSupabaseConfig(url, key);
     }
   };
+
+  const sqlSetup = `-- 1. Table Profiles
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS phone TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS email TEXT;
+
+-- 2. Storage
+-- Créez un bucket PUBLIC nommé 'avatars'`;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -30,7 +40,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, onClose }) => 
 
         <div className="mb-8">
           <h2 className="text-2xl font-black text-gray-900 tracking-tight leading-tight">Configuration Supabase</h2>
-          <p className="text-sm text-gray-500 font-medium">Paramétrez votre base de données et votre stockage de photos.</p>
+          <p className="text-sm text-gray-500 font-medium">Paramétrez votre base de données et votre stockage.</p>
         </div>
 
         <form onSubmit={handleSave} className="space-y-6">
@@ -60,20 +70,29 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, onClose }) => 
           </div>
 
           <div className="bg-purple-50 border border-purple-100 p-6 rounded-3xl space-y-4">
-             <div className="flex items-start gap-3">
-               <div className="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white flex-shrink-0 mt-0.5 font-bold text-xs">!</div>
-               <div className="w-full">
-                  <p className="text-xs font-black text-purple-900 uppercase tracking-tight mb-2">Configuration du Stockage</p>
-                  <p className="text-[10px] text-purple-800 leading-relaxed">
-                    Pour l'upload de photos, créez un bucket <strong>'avatars'</strong> dans Supabase Storage :
-                  </p>
-                  <ul className="mt-3 space-y-2 text-[10px] text-purple-700 font-bold list-disc pl-4">
-                    <li>Rendre le bucket <strong>Public</strong>.</li>
-                    <li>Ajouter une Policy <strong>INSERT</strong> pour autoriser l'upload.</li>
-                    <li>Ajouter une Policy <strong>SELECT</strong> pour la lecture.</li>
-                  </ul>
+             <button 
+               type="button"
+               onClick={() => setShowSql(!showSql)}
+               className="flex items-center justify-between w-full text-[10px] font-black text-purple-900 uppercase tracking-tight"
+             >
+                <span>Script SQL Requis</span>
+                <span>{showSql ? 'Fermer' : 'Voir'}</span>
+             </button>
+             
+             {showSql && (
+               <div className="relative">
+                 <pre className="text-[9px] bg-black text-green-400 p-3 rounded-lg overflow-x-auto font-mono leading-relaxed">
+                   {sqlSetup}
+                 </pre>
+                 <p className="text-[9px] text-purple-700 mt-2 font-bold italic">Copiez ce code dans le SQL Editor de Supabase.</p>
                </div>
-             </div>
+             )}
+
+             {!showSql && (
+                <p className="text-[10px] text-purple-800 leading-relaxed">
+                  Assurez-vous d'avoir ajouté les colonnes <strong>is_active</strong> et <strong>is_admin</strong> à votre table profiles via SQL.
+                </p>
+             )}
           </div>
 
           <button 
